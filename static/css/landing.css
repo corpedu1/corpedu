@@ -175,23 +175,42 @@ a {
 }
 
 .panel__list {
+    list-style: none;
+    counter-reset: org-benefit;
     margin: 0;
-    padding: 0 0 0 20px;
+    padding: 0;
     display: grid;
-    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
 }
 
 .panel__list li {
+    position: relative;
+    counter-increment: org-benefit;
     color: #1e293b;
     font-size: 1rem;
     line-height: 1.5;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #cbd5e1;
+    padding: 40px 14px 14px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.panel__list li::before {
+    content: counter(org-benefit, decimal-leading-zero);
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    color: #64748b;
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.4px;
 }
 
 .panel__list li:last-child {
-    border-bottom: 0;
-    padding-bottom: 0;
+    border-bottom: 1px solid #cbd5e1;
 }
 
 .section {
@@ -366,6 +385,10 @@ a {
     .cards,
     .security-grid,
     .steps {
+        grid-template-columns: 1fr;
+    }
+
+    .panel__list {
         grid-template-columns: 1fr;
     }
 
