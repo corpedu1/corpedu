@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Платформа обучения по информационной безопасности</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="container topbar__content">
+            <a class="brand" href="/">CyberLearn Витте</a>
+            <nav class="topbar__nav">
+                <a href="#vozmozhnosti">Возможности</a>
+                <a href="#bezopasnost">Безопасность</a>
+                <a href="#proces">Как это работает</a>
+            </nav>
+            <a class="button button--small" href="/admin/">Войти</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container hero__grid">
+                <div class="hero__text">
+                    <p class="eyebrow">Для сотрудников организаций</p>
+                    <h1>Обучение кибербезопасности и контроль знаний в одном сервисе</h1>
+                    <p class="hero__lead">
+                        Платформа помогает быстро обучать персонал, регулярно проверять знания и снижать риски
+                        инцидентов в рабочих процессах.
+                    </p>
+                    <div class="hero__actions">
+                        <a class="button" href="/admin/">Начать работу</a>
+                        <a class="button button--ghost" href="#vozmozhnosti">Посмотреть возможности</a>
+                    </div>
+                    <ul class="hero__facts">
+                        <li>Материалы и тесты в личном кабинете</li>
+                        <li>Роли: администратор, куратор, сотрудник</li>
+                        <li>Регулярная оценка уровня знаний</li>
+                    </ul>
+                </div>
+                <div class="hero__panel">
+                    <h2>Что получает организация</h2>
+                    <div class="panel__item">
+                        <h3>Единый стандарт обучения</h3>
+                        <p>Все сотрудники проходят актуальные программы и единые тесты.</p>
+                    </div>
+                    <div class="panel__item">
+                        <h3>Прозрачная аналитика</h3>
+                        <p>Руководители видят прогресс и результаты по подразделениям.</p>
+                    </div>
+                    <div class="panel__item">
+                        <h3>Снижение рисков</h3>
+                        <p>Практические сценарии учат предотвращать фишинг и утечки данных.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="vozmozhnosti">
+            <div class="container">
+                <h2>Ключевые возможности платформы</h2>
+                <div class="cards">
+                    <article class="card">
+                        <h3>Обучающие модули</h3>
+                        <p>Текстовые материалы, инструкции и методические блоки по темам ИБ.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Проверка знаний</h3>
+                        <p>Тесты с разными уровнями сложности и контролем прохождения.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Ролевые кабинеты</h3>
+                        <p>Отдельный функционал для администратора, куратора и сотрудника.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Контроль динамики</h3>
+                        <p>Мониторинг прогресса, успеваемости и закрытия обязательных программ.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--accent" id="bezopasnost">
+            <div class="container">
+                <h2>Акцент на безопасности сервиса</h2>
+                <div class="security-grid">
+                    <div class="security-item">
+                        <h3>Разграничение доступа</h3>
+                        <p>Функции и данные доступны только в рамках назначенной роли.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Защита сессий</h3>
+                        <p>Механизмы защиты от несанкционированного доступа к учетным записям.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Безопасная работа с данными</h3>
+                        <p>Обработка пользовательских данных с учетом базовых принципов ИБ.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="proces">
+            <div class="container">
+                <h2>Как проходит обучение</h2>
+                <div class="steps">
+                    <div class="step">
+                        <span>01</span>
+                        <p>Сотрудник получает доступ к программе обучения.</p>
+                    </div>
+                    <div class="step">
+                        <span>02</span>
+                        <p>Изучает материалы и проходит тестирование.</p>
+                    </div>
+                    <div class="step">
+                        <span>03</span>
+                        <p>Куратор и администратор отслеживают результаты и прогресс.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin/">Перейти к авторизации</a>
+        </div>
+    </footer>
+    <script src="{% static 'js/landing.js' %}"></script>
+</body>
+</html>
