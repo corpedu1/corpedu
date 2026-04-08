@@ -174,26 +174,6 @@ a {
     letter-spacing: 0.2px;
 }
 
-.section--benefits {
-    padding-top: 48px;
-}
-
-.benefits {
-    background: linear-gradient(165deg, #0f172a, #1e293b);
-    color: #f8fafc;
-    border: 1px solid rgba(125, 211, 252, 0.35);
-    border-radius: 18px;
-    padding: 30px 28px;
-    box-shadow: 0 14px 34px rgba(2, 6, 23, 0.18);
-}
-
-.benefits h2 {
-    margin: 0 0 20px;
-    font-size: 1.45rem;
-    line-height: 1.2;
-    letter-spacing: 0.2px;
-}
-
 .panel__list {
     margin: 0;
     padding: 0 0 0 20px;
@@ -202,11 +182,11 @@ a {
 }
 
 .panel__list li {
-    color: #dbeafe;
+    color: #1e293b;
     font-size: 1rem;
     line-height: 1.5;
     padding-bottom: 10px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+    border-bottom: 1px solid #cbd5e1;
 }
 
 .panel__list li:last-child {
@@ -225,25 +205,81 @@ a {
 
 .cards {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 18px;
 }
 
 .card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
+    position: relative;
+    width: 100%;
+    max-width: 230px;
+    min-height: 250px;
+    background: #0f172a;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.62rem;
+    line-height: 1.25;
+    font-weight: 700;
+    border-radius: 15px;
+    border: 1px solid rgba(125, 211, 252, 0.35);
+    cursor: pointer;
+    overflow: hidden;
     padding: 20px;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+    transition: color 0.25s ease;
 }
 
-.card h3 {
-    margin: 0 0 8px;
+.card::before,
+.card::after {
+    position: absolute;
+    content: "";
+    width: 20%;
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    background-color: #1e3a8a;
+    transition: all 0.5s;
+    color: #0f172a;
 }
 
-.card p {
-    margin: 0;
-    color: #334155;
+.card::before {
+    top: 0;
+    right: 0;
+    border-radius: 0 15px 0 100%;
+}
+
+.card::after {
+    bottom: 0;
+    left: 0;
+    border-radius: 0 100% 0 15px;
+    content: "";
+    font-size: 1.08rem;
+    line-height: 1.5;
+    text-align: left;
+    padding: 0;
+}
+
+.card:hover::before,
+.card:hover::after {
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    background: linear-gradient(140deg, #0f172a 0%, #1e3a8a 45%, #0ea5e9 100%);
+    transition: all 0.5s;
+}
+
+.card:hover::after {
+    content: attr(data-description);
+    color: #f8fafc;
+    padding: 18px;
+}
+
+.card:hover {
+    color: transparent;
 }
 
 .section--accent {
