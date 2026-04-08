@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section contacts-page">
+            <div class="container">
+                <p class="section-kicker">Связь</p>
+                <h1>Контакты</h1>
+                <p class="section-subtitle">Свяжитесь с нами по телефону, электронной почте или посетите офис по адресу, указанному на карте.</p>
+
+                <div class="contacts-grid">
+                    <article class="contacts-card">
+                        <p class="contacts-card__kicker">Общий канал</p>
+                        <h3>Основные контакты</h3>
+                        <ul class="contacts-list">
+                            <li><span>Телефон:</span> +7 (495) 123-45-67</li>
+                            <li><span>E-mail:</span> info@cyberlearn-vitte.ru</li>
+                            <li><span>Адрес:</span> 2-й Кожуховский проезд, Москва</li>
+                        </ul>
+                    </article>
+
+                    <article class="contacts-card">
+                        <p class="contacts-card__kicker">Режим работы</p>
+                        <h3>График работы</h3>
+                        <ul class="contacts-list">
+                            <li><span>Пн-Пт:</span> 09:00 - 19:00</li>
+                            <li><span>Сб:</span> 10:00 - 15:00</li>
+                            <li><span>Вс:</span> выходной</li>
+                        </ul>
+                    </article>
+
+                    <article class="contacts-card">
+                        <p class="contacts-card__kicker">Службы</p>
+                        <h3>Отделы и поддержка</h3>
+                        <ul class="contacts-list">
+                            <li><span>Техподдержка:</span> support@cyberlearn-vitte.ru</li>
+                            <li><span>Учебный отдел:</span> education@cyberlearn-vitte.ru</li>
+                            <li><span>Партнерство:</span> partners@cyberlearn-vitte.ru</li>
+                        </ul>
+                    </article>
+                </div>
+
+                <div class="contacts-map-wrap">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15120.641118896838!2d37.65627018573483!3d55.71164274250781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x414ab4caf9faf987%3A0xbfd80e63b2dea40f!2s2-Y%20Kozhukhovskiy%20Proyezd%2C%20Moskva%2C%20Russia!5e0!3m2!1sen!2saz!4v1764412880585!5m2!1sen!2saz" width="100%" height="100%" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="google-map" title="Карта"></iframe>
+                </div>
+
+                <div class="contacts-note">
+                    <p>Перед посещением офиса рекомендуем заранее согласовать время визита с ответственным менеджером.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin/">Перейти к авторизации</a>
+        </div>
+    </footer>
+</body>
+</html>

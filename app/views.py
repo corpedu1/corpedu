@@ -17,3 +17,10 @@ def about(request):
     Отображает страницу «О нас».
     """
     return render(request, "about.html")
+
+
+def contacts(request):
+    """
+    Отображает страницу «Контакты».
+    """
+    return render(request, "contacts.html")
