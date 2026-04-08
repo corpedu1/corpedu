@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О нас | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="about-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="about-intro">
+            <div class="container">
+                <div class="about-intro__layout">
+                    <div>
+                        <p class="eyebrow">О платформе</p>
+                        <h1>О нас</h1>
+                        <p class="hero__lead">
+                            CyberLearn Витте - это корпоративная платформа обучения по информационной безопасности
+                            для сотрудников организаций. Мы объединяем качественные учебные материалы,
+                            контроль знаний и ролевое управление в одном безопасном веб-сервисе.
+                        </p>
+                    </div>
+                    <div class="stats-card-wrap">
+                        <div class="stats-card">
+                            <div class="stats-card__top">
+                                <div class="stats-card__border"></div>
+                                <div class="stats-card__icons">
+                                    <div class="stats-card__logo"></div>
+                                    <div class="stats-card__signals">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stats-card__bottom">
+                                <span class="stats-card__title">Наши показатели</span>
+                                <div class="stats-card__row">
+                                    <div class="stats-card__item">
+                                        <span class="stats-card__big">24/7</span>
+                                        <span class="stats-card__small">доступ</span>
+                                    </div>
+                                    <div class="stats-card__item">
+                                        <span class="stats-card__big">100%</span>
+                                        <span class="stats-card__small">контроль процесса</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section about-section">
+            <div class="container">
+                <p class="section-kicker">Хронология</p>
+                <h2>История проекта</h2>
+                <p class="section-subtitle">Ключевые этапы развития платформы от идеи до полноценной рабочей системы.</p>
+                <div class="about-history-lines">
+                    <div class="history-line">
+                        <span>2024</span>
+                        <p>Идея и исследование: команда методистов и специалистов по ИБ зафиксировала потребность в единой платформе для системного обучения сотрудников.</p>
+                    </div>
+                    <div class="history-line">
+                        <span>2025</span>
+                        <p>Пилотный запуск: проект прошел пилот в нескольких подразделениях и показал устойчивый рост вовлеченности в обучение.</p>
+                    </div>
+                    <div class="history-line">
+                        <span>2026</span>
+                        <p>Развитие платформы: добавлены ролевые кабинеты, аналитика прогресса и модульные учебные программы.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section about-section">
+            <div class="container">
+                <p class="section-kicker">Профиль</p>
+                <h2>Информация об организации</h2>
+                <p class="section-subtitle">Коротко о команде, методологии и направлении развития проекта.</p>
+                <div class="about-parallel">
+                    <article class="about-parallel__item">
+                        <h3>Профиль и команда</h3>
+                        <p>Платформа создана для организаций, которым нужен единый контур обучения и проверки знаний в области ИБ. В развитии участвуют кураторы учебных программ, специалисты по ИБ и команда разработки.</p>
+                    </article>
+                    <article class="about-parallel__item">
+                        <h3>Методология и развитие</h3>
+                        <p>Основа подхода - практические сценарии, регулярные проверки и прозрачные метрики. В дорожной карте: персонализация обучения и расширение механизмов контроля.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section about-section">
+            <div class="container">
+                <p class="section-kicker">Подход</p>
+                <div class="about-dual">
+                    <div class="about-column">
+                        <h2>Наша цель</h2>
+                        <ul class="about-plain-list">
+                            <li>Повышать уровень киберграмотности сотрудников.</li>
+                            <li>Снижать риски инцидентов и утечек данных в организациях.</li>
+                            <li>Помогать руководителям контролировать и развивать знания команд.</li>
+                        </ul>
+                    </div>
+                    <div class="about-column">
+                        <h2>Принципы нашей работы</h2>
+                        <ul class="about-plain-list">
+                            <li>Практическая направленность обучения.</li>
+                            <li>Понятные и прозрачные метрики.</li>
+                            <li>Непрерывное обновление контента.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin/">Перейти к авторизации</a>
+        </div>
+    </footer>
+</body>
+</html>

@@ -8,17 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/landing.css' %}">
 </head>
 <body>
-    <header class="topbar">
-        <div class="container topbar__content">
-            <a class="brand" href="/">CyberLearn Витте</a>
-            <nav class="topbar__nav">
-                <a href="#vozmozhnosti">Возможности</a>
-                <a href="#bezopasnost">Безопасность</a>
-                <a href="#proces">Как это работает</a>
-            </nav>
-            <a class="button button--small" href="/admin/">Войти</a>
-        </div>
-    </header>
+    {% include "partials/navbar.html" %}
 
     <main>
         <section class="hero">
@@ -30,10 +20,6 @@
                         Платформа помогает быстро обучать персонал, регулярно проверять знания и снижать риски
                         инцидентов в рабочих процессах.
                     </p>
-                    <div class="hero__actions">
-                        <a class="button" href="/admin/">Начать работу</a>
-                        <a class="button button--ghost" href="#vozmozhnosti">Посмотреть возможности</a>
-                    </div>
                     <ul class="hero__facts">
                         <li>Материалы и тесты в личном кабинете</li>
                         <li>Роли: администратор, куратор, сотрудник</li>
@@ -50,7 +36,9 @@
 
         <section class="section" id="vozmozhnosti">
             <div class="container">
+                <p class="section-kicker">Функциональность</p>
                 <h2>Ключевые возможности платформы</h2>
+                <p class="section-subtitle">Набор инструментов для обучения сотрудников и регулярной проверки уровня знаний.</p>
                 <div class="cards">
                     <div class="card" data-description="Текстовые материалы, инструкции и методические блоки по темам ИБ.">Обучающие модули</div>
                     <div class="card" data-description="Тесты с разными уровнями сложности и контролем прохождения.">Проверка знаний</div>
@@ -62,7 +50,9 @@
 
         <section class="section" id="preimushchestva">
             <div class="container">
+                <p class="section-kicker">Результат</p>
                 <h2>Что получает организация</h2>
+                <p class="section-subtitle">Практические эффекты от внедрения платформы в рабочие процессы.</p>
                 <ol class="panel__list">
                     <li>Единый стандарт обучения: все сотрудники проходят актуальные программы и единые тесты.</li>
                     <li>Прозрачная аналитика: руководители видят прогресс и результаты по подразделениям.</li>
@@ -73,7 +63,9 @@
 
         <section class="section section--accent" id="bezopasnost">
             <div class="container">
+                <p class="section-kicker">Приоритет</p>
                 <h2>Акцент на безопасности сервиса</h2>
+                <p class="section-subtitle">Базовые принципы защиты данных и управления доступом внутри платформы.</p>
                 <div class="security-grid">
                     <div class="security-item">
                         <h3>Разграничение доступа</h3>
@@ -93,7 +85,9 @@
 
         <section class="section" id="proces">
             <div class="container">
+                <p class="section-kicker">Процесс</p>
                 <h2>Как проходит обучение</h2>
+                <p class="section-subtitle">Простой и контролируемый цикл обучения для сотрудника и куратора.</p>
                 <div class="steps">
                     <div class="step">
                         <span>01</span>
