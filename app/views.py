@@ -24,3 +24,10 @@ def contacts(request):
     Отображает страницу «Контакты».
     """
     return render(request, "contacts.html")
+
+
+def feedback(request):
+    """
+    Отображает страницу «Обратная связь».
+    """
+    return render(request, "feedback.html")

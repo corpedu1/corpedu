@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обратная связь | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">Форма</p>
+                <h1>Обратная связь</h1>
+                <p class="section-subtitle">Оставьте сообщение, и мы свяжемся с вами. На данном этапе форма работает только как frontend.</p>
+
+                <form class="feedback-form" action="#" method="post">
+                    <div class="feedback-form__grid">
+                        <div class="feedback-field">
+                            <label for="feedback_name">Имя</label>
+                            <input id="feedback_name" name="name" type="text" placeholder="Введите имя">
+                        </div>
+                        <div class="feedback-field">
+                            <label for="feedback_phone">Телефон</label>
+                            <input id="feedback_phone" name="phone" type="tel" placeholder="+7 (___) ___-__-__">
+                        </div>
+                        <div class="feedback-field">
+                            <label for="feedback_email">Почта</label>
+                            <input id="feedback_email" name="email" type="email" placeholder="example@mail.ru">
+                        </div>
+                        <div class="feedback-field">
+                            <label for="feedback_subject">Тема</label>
+                            <input id="feedback_subject" name="subject" type="text" placeholder="Тема обращения">
+                        </div>
+                    </div>
+
+                    <div class="feedback-field">
+                        <label for="feedback_message">Текст</label>
+                        <textarea id="feedback_message" name="message" rows="7" placeholder="Введите текст сообщения"></textarea>
+                    </div>
+
+                    <button class="feedback-submit" type="submit">Отправить</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin/">Перейти к авторизации</a>
+        </div>
+    </footer>
+</body>
+</html>
