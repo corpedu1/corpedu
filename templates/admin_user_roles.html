@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Роли пользователей | Админ панель</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section admin-panel-page">
+            <div class="container">
+                <div class="admin-layout">
+                    {% include "partials/admin_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Администрирование</p>
+                        <h1>Изменение ролей пользователей</h1>
+                        <p class="section-subtitle">
+                            Поиск по логину и назначение роли для каждого пользователя.
+                        </p>
+
+                        <article class="admin-role-card">
+                            <div class="admin-role-form__group">
+                                <label for="user_search">Поиск по логину</label>
+                                <input type="text" id="user_search" placeholder="Начните вводить логин" data-user-search>
+                            </div>
+
+                            {% if error_message %}
+                                <div class="register-form-errors">
+                                    <p>{{ error_message }}</p>
+                                </div>
+                            {% endif %}
+
+                            {% if success_message %}
+                                <div class="admin-success-message">
+                                    <p>{{ success_message }}</p>
+                                </div>
+                            {% endif %}
+
+                            <div class="admin-users-list" data-users-list>
+                                {% for user_item in users %}
+                                    <form method="post" action="/admin-panel/user-roles/" class="admin-user-row" data-user-row data-login="{{ user_item.username|lower }}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ user_item.id }}">
+                                        <div class="admin-user-row__identity">
+                                            <strong>{{ user_item.username }}</strong>
+                                            <span>{% if user_item.first_name or user_item.last_name %}{{ user_item.first_name }} {{ user_item.last_name }}{% else %}Без имени{% endif %}</span>
+                                        </div>
+                                        <div class="admin-user-row__actions">
+                                            <select name="role" required>
+                                                {% for role_value, role_title in role_choices %}
+                                                    <option value="{{ role_value }}" {% if user_item.role == role_value %}selected{% endif %}>{{ role_title }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button class="register-submit" type="submit">Сохранить</button>
+                                        </div>
+                                    </form>
+                                {% endfor %}
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin-panel/">Вернуться в админ панель</a>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/admin_user_roles.js' %}"></script>
+</body>
+</html>

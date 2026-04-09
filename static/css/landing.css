@@ -76,6 +76,56 @@ a {
     border-bottom: 1px solid rgba(148, 163, 184, 0.2);
 }
 
+.admin-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 22px;
+}
+
+.admin-layout__content {
+    min-width: 0;
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 88px;
+    align-self: start;
+    background: #1e293b;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 14px;
+    padding: 14px 12px;
+}
+
+.admin-sidebar__brand {
+    display: block;
+    color: #e2e8f0;
+    text-decoration: none;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    padding: 8px 10px;
+}
+
+.admin-sidebar__nav {
+    display: grid;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.admin-sidebar__nav a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.admin-sidebar__nav a:hover {
+    color: #7dd3fc;
+    background: rgba(15, 23, 42, 0.5);
+}
+
 .topbar__content {
     display: flex;
     align-items: center;
@@ -1004,6 +1054,123 @@ a {
     line-height: 1.1;
 }
 
+.admin-role-card {
+    margin-top: 24px;
+    border-radius: 14px;
+    border: 1px solid #dbe5ef;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    padding: 20px 18px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    max-width: 680px;
+}
+
+.admin-role-form {
+    display: grid;
+    gap: 12px;
+}
+
+.admin-role-form__group {
+    display: grid;
+    gap: 6px;
+}
+
+.admin-role-form__group label {
+    color: #334155;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.admin-role-form__group input,
+.admin-role-form__group select {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    padding: 10px 12px;
+    font-family: inherit;
+    color: #0f172a;
+    background: #ffffff;
+    outline: none;
+}
+
+.admin-role-form__group input:focus,
+.admin-role-form__group select:focus {
+    border-color: #0ea5e9;
+}
+
+.admin-success-message {
+    border: 1px solid #166534;
+    border-radius: 8px;
+    background: rgba(22, 101, 52, 0.1);
+    padding: 8px 10px;
+}
+
+.admin-success-message p {
+    margin: 0;
+    color: #166534;
+    font-size: 0.86rem;
+}
+
+.admin-users-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.admin-user-row {
+    border: 1px solid #dbe5ef;
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+    background: #ffffff;
+}
+
+.admin-user-row__identity {
+    display: grid;
+    gap: 2px;
+}
+
+.admin-user-row__identity strong {
+    color: #0f172a;
+    font-size: 0.98rem;
+}
+
+.admin-user-row__identity span {
+    color: #64748b;
+    font-size: 0.84rem;
+}
+
+.admin-user-row__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-user-row__actions select {
+    min-width: 170px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    padding: 9px 10px;
+    font-family: inherit;
+}
+
+.admin-user-row .register-submit {
+    width: auto;
+    margin-top: 0;
+    padding: 10px 14px;
+    background: #0ea5a5;
+    border: 1px solid #0ea5a5;
+    color: #ecfeff;
+}
+
+.admin-user-row .register-submit:hover {
+    background: #0f766e;
+    border-color: #0f766e;
+    color: #f0fdfa;
+}
+
 .settings-page__container {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1352,6 +1519,18 @@ a {
         display: none;
     }
 
+    .admin-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+        position: static;
+    }
+
+    .admin-sidebar__nav {
+        grid-template-columns: 1fr;
+    }
+
     .topbar__actions {
         margin-left: auto;
     }
@@ -1390,6 +1569,22 @@ a {
 
     .admin-panel-grid {
         grid-template-columns: 1fr;
+    }
+
+    .admin-user-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-user-row__actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-user-row__actions select,
+    .admin-user-row .register-submit {
+        width: 100%;
     }
 
     .about-page .about-intro__layout {

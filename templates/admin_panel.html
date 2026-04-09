@@ -13,33 +13,38 @@
     <main>
         <section class="section admin-panel-page">
             <div class="container">
-                <p class="section-kicker">Управление</p>
-                <h1>Админ панель</h1>
-                <p class="section-subtitle">
-                    Сводная информация по пользователям и обучающим материалам платформы.
-                </p>
+                <div class="admin-layout">
+                    {% include "partials/admin_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Управление</p>
+                        <h1>Админ панель</h1>
+                        <p class="section-subtitle">
+                            Сводная информация по пользователям и обучающим материалам платформы.
+                        </p>
 
-                <div class="admin-panel-grid">
-                    <article class="admin-panel-card">
-                        <p class="admin-panel-card__label">Пользователи</p>
-                        <p class="admin-panel-card__value">{{ users_count }}</p>
-                    </article>
-                    <article class="admin-panel-card">
-                        <p class="admin-panel-card__label">Кураторы</p>
-                        <p class="admin-panel-card__value">{{ curators_count }}</p>
-                    </article>
-                    <article class="admin-panel-card">
-                        <p class="admin-panel-card__label">Материалы</p>
-                        <p class="admin-panel-card__value">{{ materials_count }}</p>
-                    </article>
-                    <article class="admin-panel-card">
-                        <p class="admin-panel-card__label">Опубликовано</p>
-                        <p class="admin-panel-card__value">{{ published_materials_count }}</p>
-                    </article>
-                    <article class="admin-panel-card">
-                        <p class="admin-panel-card__label">Категории</p>
-                        <p class="admin-panel-card__value">{{ categories_count }}</p>
-                    </article>
+                        <div class="admin-panel-grid">
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Пользователи</p>
+                                <p class="admin-panel-card__value">{{ users_count }}</p>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Кураторы</p>
+                                <p class="admin-panel-card__value">{{ curators_count }}</p>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Материалы</p>
+                                <p class="admin-panel-card__value">{{ materials_count }}</p>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Опубликовано</p>
+                                <p class="admin-panel-card__value">{{ published_materials_count }}</p>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Категории</p>
+                                <p class="admin-panel-card__value">{{ categories_count }}</p>
+                            </article>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

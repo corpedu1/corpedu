@@ -13,6 +13,13 @@ from .forms import LoginForm, ProfileForm, RegisterForm
 from .models import LearningMaterial, MaterialCategory, User, UserRole
 
 
+def _is_administrator(user):
+    """
+    Проверяет, что пользователь является администратором.
+    """
+    return user.is_authenticated and user.role == UserRole.ADMINISTRATOR
+
+
 def landing(request):
     """
     Отображает главную страницу веб-сервиса.
@@ -131,7 +138,7 @@ def admin_panel(request):
     """
     Отображает кастомную панель администратора.
     """
-    if request.user.role != UserRole.ADMINISTRATOR:
+    if not _is_administrator(request.user):
         return redirect("landing")
     context = {
         "users_count": User.objects.count(),
@@ -141,3 +148,51 @@ def admin_panel(request):
         "categories_count": MaterialCategory.objects.count(),
     }
     return render(request, "admin_panel.html", context)
+
+
+@login_required
+def admin_user_roles(request):
+    """
+    Отображает и обрабатывает страницу изменения ролей пользователей.
+    """
+    if not _is_administrator(request.user):
+        return redirect("landing")
+    users = User.objects.order_by("username")
+    allowed_roles = (
+        UserRole.USER,
+        UserRole.ADMINISTRATOR,
+        UserRole.CURATOR,
+    )
+    role_choices = [choice for choice in UserRole.choices if choice[0] in allowed_roles]
+    error_message = ""
+    success_message = ""
+    selected_user_id = ""
+    selected_role = ""
+    if request.method == "POST":
+        selected_user_id = request.POST.get("user_id", "").strip()
+        selected_role = request.POST.get("role", "").strip()
+        if not selected_user_id or not selected_role:
+            error_message = "Выберите пользователя и роль."
+        elif selected_role not in allowed_roles:
+            error_message = "Указана недопустимая роль."
+        else:
+            try:
+                target_user = User.objects.get(pk=selected_user_id)
+            except User.DoesNotExist:
+                error_message = "Пользователь не найден."
+            else:
+                target_user.role = selected_role
+                if selected_role == UserRole.ADMINISTRATOR:
+                    target_user.is_staff = True
+                target_user.save(update_fields=["role", "is_staff"])
+                success_message = f"Роль пользователя {target_user.username} успешно обновлена."
+                selected_user_id = str(target_user.pk)
+    context = {
+        "users": users,
+        "role_choices": role_choices,
+        "error_message": error_message,
+        "success_message": success_message,
+        "selected_user_id": selected_user_id,
+        "selected_role": selected_role,
+    }
+    return render(request, "admin_user_roles.html", context)
