@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Материалы куратора | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section admin-panel-page">
+            <div class="container">
+                <div class="admin-layout">
+                    {% include "partials/curator_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Куратор</p>
+                        <h1>Материалы</h1>
+                        <p class="section-subtitle">Выберите материал из списка для перехода на страницу детального редактирования.</p>
+
+                        {% if materials %}
+                            <div class="curator-material-list">
+                                {% for item in materials %}
+                                    <a class="curator-material-list__item" href="/curator-panel/materials/{{ item.slug }}/">
+                                        <div>
+                                            <h3>{{ item.title }}</h3>
+                                            <p>{{ item.summary|default:"Описание отсутствует." }}</p>
+                                        </div>
+                                        <div class="curator-material-list__meta">
+                                            <span>{{ item.category.name }}</span>
+                                            <span>{{ item.get_material_format_display }}</span>
+                                            <span>{% if item.is_published %}Опубликован{% else %}Черновик{% endif %}</span>
+                                        </div>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="materials-empty">
+                                <p>У вас пока нет созданных материалов.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/curator-panel/">Вернуться в панель куратора</a>
+        </div>
+    </footer>
+</body>
+</html>

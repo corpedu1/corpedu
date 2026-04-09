@@ -36,6 +36,8 @@ urlpatterns = [
     path('admin-panel/user-roles/', views.admin_user_roles, name='admin_user_roles'),
     path('admin-panel/material-categories/', views.admin_material_categories, name='admin_material_categories'),
     path('curator-panel/', views.curator_panel, name='curator_panel'),
+    path('curator-panel/materials/', views.curator_materials_manage, name='curator_materials_manage'),
+    path('curator-panel/materials/<slug:slug>/', views.curator_material_edit, name='curator_material_edit'),
     path('curator-panel/materials/create/', views.curator_material_create, name='curator_material_create'),
     path('admin/', admin.site.urls),
 ]

@@ -31,14 +31,17 @@ def _is_curator(user):
     return user.is_authenticated and user.role == UserRole.CURATOR
 
 
-def _build_unique_material_slug(title):
+def _build_unique_material_slug(title, current_id=None):
     """
     Формирует уникальный слаг для учебного материала.
     """
     base_slug = slugify(title) or "material"
     slug = base_slug
     index = 1
-    while LearningMaterial.objects.filter(slug=slug).exists():
+    queryset = LearningMaterial.objects.all()
+    if current_id is not None:
+        queryset = queryset.exclude(pk=current_id)
+    while queryset.filter(slug=slug).exists():
         index += 1
         slug = f"{base_slug}-{index}"
     return slug
@@ -365,4 +368,72 @@ def curator_material_create(request):
         request,
         "curator_material_create.html",
         {"form": form, "success_message": success_message},
+    )
+
+
+@login_required
+def curator_materials_manage(request):
+    """
+    Отображает страницу списка материалов куратора.
+    """
+    if not _is_curator(request.user):
+        return redirect("landing")
+    items = LearningMaterial.objects.filter(author=request.user).select_related("category").order_by("-created_at")
+    return render(request, "curator_materials_manage.html", {"materials": items})
+
+
+@login_required
+def curator_material_edit(request, slug):
+    """
+    Отображает и обрабатывает страницу детального редактирования материала куратора.
+    """
+    if not _is_curator(request.user):
+        return redirect("landing")
+    material = get_object_or_404(LearningMaterial, slug=slug, author=request.user)
+    success_message = ""
+    error_message = ""
+    if request.method == "POST":
+        action = request.POST.get("action", "").strip()
+        if action == "delete":
+            material.delete()
+            return redirect("curator_materials_manage")
+        if action == "remove_attachment":
+            material.attachment = None
+            material.save(update_fields=["attachment"])
+            success_message = "Файл удален."
+        else:
+            form = CuratorMaterialForm(request.POST, request.FILES, instance=material)
+            if form.is_valid():
+                updated = form.save(commit=False)
+                updated.author = request.user
+                updated.slug = _build_unique_material_slug(updated.title, current_id=updated.id)
+                if updated.is_published and updated.published_at is None:
+                    updated.published_at = timezone.now()
+                if not updated.is_published:
+                    updated.published_at = None
+                updated.save()
+                success_message = "Материал обновлен."
+                form = CuratorMaterialForm(instance=updated)
+            else:
+                error_message = "Проверьте корректность заполнения формы."
+                return render(
+                    request,
+                    "curator_material_edit.html",
+                    {
+                        "form": form,
+                        "material": material,
+                        "error_message": error_message,
+                        "success_message": success_message,
+                    },
+                )
+    form = CuratorMaterialForm(instance=material)
+    return render(
+        request,
+        "curator_material_edit.html",
+        {
+            "form": form,
+            "material": material,
+            "error_message": error_message,
+            "success_message": success_message,
+        },
     )

@@ -33,6 +33,7 @@
                                     <span>Автор: {{ item.author.username }}</span>
                                     <span>{{ item.estimated_minutes }} мин</span>
                                 </div>
+                                <a class="material-card__details-button" href="/materials/{{ item.slug }}/">Подробнее</a>
                             </article>
                         {% endfor %}
                     </div>

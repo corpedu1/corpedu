@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование материала | Панель куратора</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section admin-panel-page">
+            <div class="container">
+                <div class="admin-layout">
+                    {% include "partials/curator_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Куратор</p>
+                        <h1>Редактирование материала</h1>
+                        <p class="section-subtitle">Подробное редактирование учебного материала и управление прикрепленными файлами.</p>
+
+                        {% if error_message %}
+                            <div class="register-form-errors admin-message-space"><p>{{ error_message }}</p></div>
+                        {% endif %}
+                        {% if success_message %}
+                            <div class="admin-success-message admin-message-space"><p>{{ success_message }}</p></div>
+                        {% endif %}
+
+                        <article class="admin-role-card">
+                            <form method="post" action="/curator-panel/materials/{{ material.slug }}/" enctype="multipart/form-data" class="admin-role-form">
+                                {% csrf_token %}
+                                <div class="admin-role-form__group">
+                                    <label for="material_title">Заголовок</label>
+                                    <input type="text" id="material_title" name="title" value="{{ form.title.value|default:'' }}" required>
+                                </div>
+                                <div class="admin-role-form__group">
+                                    <label for="material_summary">Краткое описание</label>
+                                    <textarea id="material_summary" name="summary" rows="3">{{ form.summary.value|default:'' }}</textarea>
+                                </div>
+                                <div class="admin-role-form__group">
+                                    <label for="material_content">Содержание</label>
+                                    <textarea id="material_content" name="content" rows="12" required>{{ form.content.value|default:'' }}</textarea>
+                                </div>
+                                <div class="admin-role-form__group">
+                                    <label for="material_format">Формат</label>
+                                    <select id="material_format" name="material_format" required>
+                                        {% for value, label in form.fields.material_format.choices %}
+                                            <option value="{{ value }}" {% if form.material_format.value == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="admin-role-form__group">
+                                    <label for="material_category">Категория</label>
+                                    <select id="material_category" name="category" required>
+                                        {% for value, label in form.fields.category.choices %}
+                                            {% if value %}
+                                                <option value="{{ value }}" {% if form.category.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="admin-role-form__group">
+                                    <label for="material_minutes">Оценка времени, мин</label>
+                                    <input type="number" id="material_minutes" name="estimated_minutes" min="1" value="{{ form.estimated_minutes.value|default:'10' }}" required>
+                                </div>
+                                <label class="curator-checkbox">
+                                    <input type="checkbox" name="is_published" {% if form.is_published.value %}checked{% endif %}>
+                                    <span>Опубликован</span>
+                                </label>
+                                <div class="admin-role-form__group">
+                                    <label for="material_attachment">Новый файл (PDF или DOCX)</label>
+                                    <input type="file" id="material_attachment" name="attachment" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                                </div>
+                                <button class="register-submit admin-save-button" type="submit" name="action" value="update">Сохранить изменения</button>
+                            </form>
+                        </article>
+
+                        {% if material.attachment %}
+                            <article class="admin-role-card admin-message-space">
+                                <h3>Прикрепленный файл</h3>
+                                <p><a href="{{ material.attachment.url }}" target="_blank" rel="noopener noreferrer">Открыть текущий файл</a></p>
+                                <form method="post" action="/curator-panel/materials/{{ material.slug }}/">
+                                    {% csrf_token %}
+                                    <button class="register-submit admin-delete-button" type="submit" name="action" value="remove_attachment">Удалить файл</button>
+                                </form>
+                            </article>
+                        {% endif %}
+
+                        <article class="admin-role-card admin-message-space">
+                            <h3>Удаление материала</h3>
+                            <form method="post" action="/curator-panel/materials/{{ material.slug }}/">
+                                {% csrf_token %}
+                                <button class="register-submit admin-delete-button" type="submit" name="action" value="delete">Удалить материал</button>
+                            </form>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/curator-panel/materials/">Вернуться к списку материалов</a>
+        </div>
+    </footer>
+</body>
+</html>
