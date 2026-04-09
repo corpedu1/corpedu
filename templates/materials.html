@@ -27,7 +27,7 @@
                                     <span>{{ item.category.name }}</span>
                                     <span>{{ item.get_material_format_display }}</span>
                                 </div>
-                                <h3>{{ item.title }}</h3>
+                                <h3><a class="material-card__title-link" href="/materials/{{ item.slug }}/">{{ item.title }}</a></h3>
                                 <p>{{ item.summary|default:"Описание материала будет добавлено позднее." }}</p>
                                 <div class="material-card__footer">
                                     <span>Автор: {{ item.author.username }}</span>

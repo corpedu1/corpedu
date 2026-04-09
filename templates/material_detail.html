@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ material.title }} | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="materials-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section material-detail-page">
+            <div class="container">
+                <p class="section-kicker">{{ material.category.name }}</p>
+                <h1>{{ material.title }}</h1>
+                <p class="section-subtitle">{{ material.summary|default:"Описание материала отсутствует." }}</p>
+
+                <div class="material-detail-meta">
+                    <span>Формат: {{ material.get_material_format_display }}</span>
+                    <span>Автор: {{ material.author.username }}</span>
+                    <span>Оценка времени: {{ material.estimated_minutes }} мин</span>
+                </div>
+
+                <article class="material-detail-content">
+                    <h3>Содержание</h3>
+                    <p>{{ material.content|linebreaksbr }}</p>
+                </article>
+
+                {% if material.attachment %}
+                    <article class="material-detail-file">
+                        <h3>Прикрепленный файл</h3>
+                        <p><a href="{{ material.attachment.url }}" target="_blank" rel="noopener noreferrer">Скачать файл</a></p>
+                        {% if material.is_pdf_attachment %}
+                            <div class="material-detail-pdf-wrap">
+                                <iframe src="{{ material.attachment.url }}" title="Просмотр PDF" class="material-detail-pdf"></iframe>
+                            </div>
+                        {% endif %}
+                    </article>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/materials/">Вернуться к списку материалов</a>
+        </div>
+    </footer>
+</body>
+</html>

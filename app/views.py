@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError
 from django.db.models.deletion import ProtectedError
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -101,6 +101,23 @@ def materials(request):
     """
     items = LearningMaterial.objects.filter(is_published=True).select_related("category", "author")
     return render(request, "materials.html", {"materials": items})
+
+
+def material_detail(request, slug):
+    """
+    Отображает страницу детального просмотра обучающего материала.
+    """
+    material = get_object_or_404(
+        LearningMaterial.objects.select_related("category", "author"),
+        slug=slug,
+    )
+    can_view_draft = request.user.is_authenticated and (
+        request.user.role == UserRole.ADMINISTRATOR
+        or material.author_id == request.user.id
+    )
+    if not material.is_published and not can_view_draft:
+        return redirect("materials")
+    return render(request, "material_detail.html", {"material": material})
 
 
 def register(request):
@@ -330,7 +347,7 @@ def curator_material_create(request):
         return redirect("landing")
     success_message = ""
     if request.method == "POST":
-        form = CuratorMaterialForm(request.POST)
+        form = CuratorMaterialForm(request.POST, request.FILES)
         if form.is_valid():
             material = form.save(commit=False)
             material.author = request.user

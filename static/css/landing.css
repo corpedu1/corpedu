@@ -994,6 +994,16 @@ a {
     color: #0f172a;
 }
 
+.material-card__title-link {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s ease;
+}
+
+.material-card__title-link:hover {
+    color: #0284c7;
+}
+
 .material-card p {
     color: #475569;
     line-height: 1.62;
@@ -1018,6 +1028,67 @@ a {
     background: #eff6ff;
     padding: 22px 18px;
     color: #1e3a8a;
+}
+
+.material-detail-page h1 {
+    color: #0f172a;
+    margin-bottom: 10px;
+}
+
+.material-detail-meta {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.material-detail-meta span {
+    font-size: 0.86rem;
+    color: #0c4a6e;
+    background: #e0f2fe;
+    border-radius: 999px;
+    padding: 6px 10px;
+}
+
+.material-detail-content,
+.material-detail-file {
+    margin-top: 18px;
+    border: 1px solid #dbe5ef;
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 16px;
+}
+
+.material-detail-content h3,
+.material-detail-file h3 {
+    margin-bottom: 10px;
+}
+
+.material-detail-content p {
+    color: #334155;
+    line-height: 1.7;
+}
+
+.material-detail-file a {
+    color: #0284c7;
+    text-decoration: none;
+}
+
+.material-detail-file a:hover {
+    text-decoration: underline;
+}
+
+.material-detail-pdf-wrap {
+    margin-top: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.material-detail-pdf {
+    width: 100%;
+    height: 640px;
+    border: 0;
 }
 
 .admin-panel-page .section h1 {
@@ -1784,6 +1855,10 @@ a {
 
     .materials-grid {
         grid-template-columns: 1fr;
+    }
+
+    .material-detail-pdf {
+        height: 420px;
     }
 
     .admin-panel-grid {

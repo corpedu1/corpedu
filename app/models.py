@@ -95,6 +95,12 @@ class LearningMaterial(models.Model):
     slug = models.SlugField(max_length=280, unique=True, verbose_name="Слаг")
     summary = models.TextField(blank=True, verbose_name="Краткое описание")
     content = models.TextField(verbose_name="Содержание")
+    attachment = models.FileField(
+        upload_to="materials/attachments/",
+        null=True,
+        blank=True,
+        verbose_name="Файл (PDF или DOCX)",
+    )
     material_format = models.CharField(
         max_length=20,
         choices=MaterialFormat.choices,
@@ -129,3 +135,11 @@ class LearningMaterial(models.Model):
         Возвращает заголовок материала.
         """
         return self.title
+
+    def is_pdf_attachment(self):
+        """
+        Проверяет, является ли прикрепленный файл PDF.
+        """
+        if not self.attachment:
+            return False
+        return self.attachment.name.lower().endswith(".pdf")

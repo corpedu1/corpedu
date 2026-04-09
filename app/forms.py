@@ -98,8 +98,21 @@ class CuratorMaterialForm(forms.ModelForm):
             "title",
             "summary",
             "content",
+            "attachment",
             "material_format",
             "category",
             "estimated_minutes",
             "is_published",
         )
+
+    def clean_attachment(self):
+        """
+        Проверяет расширение прикрепленного файла.
+        """
+        attachment = self.cleaned_data.get("attachment")
+        if not attachment:
+            return attachment
+        filename = attachment.name.lower()
+        if not (filename.endswith(".pdf") or filename.endswith(".docx")):
+            raise forms.ValidationError("Разрешены только файлы PDF или DOCX.")
+        return attachment

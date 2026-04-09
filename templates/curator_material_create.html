@@ -37,7 +37,7 @@
                                 </div>
                             {% endif %}
 
-                            <form method="post" action="/curator-panel/materials/create/" class="admin-role-form">
+                            <form method="post" action="/curator-panel/materials/create/" class="admin-role-form" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="admin-role-form__group">
                                     <label for="material_title">Заголовок</label>
@@ -52,6 +52,11 @@
                                 <div class="admin-role-form__group">
                                     <label for="material_content">Содержание</label>
                                     <textarea name="content" id="material_content" rows="8" required>{{ form.content.value|default:'' }}</textarea>
+                                </div>
+
+                                <div class="admin-role-form__group">
+                                    <label for="material_attachment">Файл (PDF или DOCX)</label>
+                                    <input type="file" name="attachment" id="material_attachment" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
                                 </div>
 
                                 <div class="admin-role-form__group">
