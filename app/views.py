@@ -10,6 +10,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import redirect, render
 
 from .forms import LoginForm, ProfileForm, RegisterForm
+from .models import LearningMaterial
 
 
 def landing(request):
@@ -45,6 +46,14 @@ def faq(request):
     Отображает страницу «FAQ».
     """
     return render(request, "faq.html")
+
+
+def materials(request):
+    """
+    Отображает страницу списка обучающих материалов.
+    """
+    items = LearningMaterial.objects.filter(is_published=True).select_related("category", "author")
+    return render(request, "materials.html", {"materials": items})
 
 
 def register(request):

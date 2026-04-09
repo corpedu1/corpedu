@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обучающие материалы | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="materials-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">База знаний</p>
+                <h1>Обучающие материалы</h1>
+                <p class="section-subtitle">
+                    Выберите материал по информационной безопасности и изучайте темы в удобном формате.
+                </p>
+
+                {% if materials %}
+                    <div class="materials-grid">
+                        {% for item in materials %}
+                            <article class="material-card">
+                                <div class="material-card__meta">
+                                    <span>{{ item.category.name }}</span>
+                                    <span>{{ item.get_material_format_display }}</span>
+                                </div>
+                                <h3>{{ item.title }}</h3>
+                                <p>{{ item.summary|default:"Описание материала будет добавлено позднее." }}</p>
+                                <div class="material-card__footer">
+                                    <span>Автор: {{ item.author.username }}</span>
+                                    <span>{{ item.estimated_minutes }} мин</span>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="materials-empty">
+                        <p>Пока нет опубликованных материалов.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/">Вернуться на главную</a>
+        </div>
+    </footer>
+</body>
+</html>
