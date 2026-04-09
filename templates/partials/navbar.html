@@ -1,3 +1,4 @@
+{% load static %}
 <header class="topbar">
     <div class="container topbar__content">
         <a class="brand" href="/">CyberLearn Витте</a>
@@ -10,7 +11,12 @@
         </nav>
         <div class="topbar__actions">
             {% if request.user.is_authenticated %}
-                <span class="topbar__user">{{ request.user.username }}</span>
+                <button type="button" class="topbar__user-button" data-user-menu-toggle>
+                    {{ request.user.username }}
+                </button>
+                <div class="topbar__user-menu" data-user-menu>
+                    <a class="topbar__user-menu-link" href="/settings/">Настройки</a>
+                </div>
                 <form method="post" action="/logout/" class="topbar__logout-form">
                     {% csrf_token %}
                     <button type="submit" class="topbar__action-link topbar__logout-button">Выход</button>
@@ -22,3 +28,4 @@
         </div>
     </div>
 </header>
+<script src="{% static 'js/navbar.js' %}"></script>

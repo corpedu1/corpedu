@@ -4,9 +4,12 @@
 
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import redirect, render
 
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, ProfileForm, RegisterForm
 
 
 def landing(request):
@@ -84,3 +87,31 @@ def logout(request):
     if request.method == "POST":
         auth_logout(request)
     return redirect("landing")
+
+
+@login_required
+def settings(request):
+    """
+    Отображает и обрабатывает страницу «Настройки».
+    """
+    profile_form = ProfileForm(instance=request.user)
+    password_form = PasswordChangeForm(user=request.user)
+    if request.method == "POST":
+        if "save_profile" in request.POST:
+            profile_form = ProfileForm(request.POST, instance=request.user)
+            if profile_form.is_valid():
+                profile_form.save()
+                return redirect("settings")
+            password_form = PasswordChangeForm(user=request.user)
+        if "save_password" in request.POST:
+            password_form = PasswordChangeForm(user=request.user, data=request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                return redirect("settings")
+            profile_form = ProfileForm(instance=request.user)
+    return render(
+        request,
+        "settings.html",
+        {"profile_form": profile_form, "password_form": password_form},
+    )

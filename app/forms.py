@@ -73,3 +73,13 @@ class LoginForm(forms.Form):
                 raise forms.ValidationError("Неверный логин или пароль.")
             cleaned_data["user"] = user
         return cleaned_data
+
+
+class ProfileForm(forms.ModelForm):
+    """
+    Форма изменения личных данных пользователя.
+    """
+
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name")

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="register-page-layout">
+    {% include "partials/navbar.html" %}
+
+    <main class="register-main">
+        <section class="section settings-page">
+            <div class="container settings-page__container">
+                <article class="settings-card">
+                    <h2>Изменение личных данных</h2>
+                    <form action="/settings/" method="post" class="settings-form">
+                        {% csrf_token %}
+                        <div class="register-input-group">
+                            <label for="settings_first_name">Имя</label>
+                            <input type="text" name="first_name" id="settings_first_name" placeholder="Введите имя" value="{{ profile_form.first_name.value|default:'' }}">
+                        </div>
+                        <div class="register-input-group">
+                            <label for="settings_last_name">Фамилия</label>
+                            <input type="text" name="last_name" id="settings_last_name" placeholder="Введите фамилию" value="{{ profile_form.last_name.value|default:'' }}">
+                        </div>
+                        {% if profile_form.non_field_errors %}
+                            <div class="register-form-errors">
+                                {% for error in profile_form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <button class="register-submit" type="submit" name="save_profile" value="1">Сохранить данные</button>
+                    </form>
+                </article>
+
+                <article class="settings-card">
+                    <h2>Изменение пароля</h2>
+                    <form action="/settings/" method="post" class="settings-form">
+                        {% csrf_token %}
+                        <div class="register-input-group">
+                            <label for="settings_old_password">Текущий пароль</label>
+                            <input type="password" name="old_password" id="settings_old_password" placeholder="Введите текущий пароль">
+                            {% if password_form.old_password.errors %}
+                                <span class="register-field-error">{{ password_form.old_password.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="register-input-group">
+                            <label for="settings_new_password1">Новый пароль</label>
+                            <input type="password" name="new_password1" id="settings_new_password1" placeholder="Введите новый пароль">
+                            {% if password_form.new_password1.errors %}
+                                <span class="register-field-error">{{ password_form.new_password1.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="register-input-group">
+                            <label for="settings_new_password2">Подтвердите новый пароль</label>
+                            <input type="password" name="new_password2" id="settings_new_password2" placeholder="Повторите новый пароль">
+                            {% if password_form.new_password2.errors %}
+                                <span class="register-field-error">{{ password_form.new_password2.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        {% if password_form.non_field_errors %}
+                            <div class="register-form-errors">
+                                {% for error in password_form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <button class="register-submit" type="submit" name="save_password" value="1">Сменить пароль</button>
+                    </form>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/">Вернуться на главную</a>
+        </div>
+    </footer>
+</body>
+</html>
