@@ -45,3 +45,10 @@ def register(request):
     Отображает страницу «Регистрация».
     """
     return render(request, "register.html")
+
+
+def login(request):
+    """
+    Отображает страницу «Вход».
+    """
+    return render(request, "login.html")
