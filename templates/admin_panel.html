@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ панель | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section admin-panel-page">
+            <div class="container">
+                <p class="section-kicker">Управление</p>
+                <h1>Админ панель</h1>
+                <p class="section-subtitle">
+                    Сводная информация по пользователям и обучающим материалам платформы.
+                </p>
+
+                <div class="admin-panel-grid">
+                    <article class="admin-panel-card">
+                        <p class="admin-panel-card__label">Пользователи</p>
+                        <p class="admin-panel-card__value">{{ users_count }}</p>
+                    </article>
+                    <article class="admin-panel-card">
+                        <p class="admin-panel-card__label">Кураторы</p>
+                        <p class="admin-panel-card__value">{{ curators_count }}</p>
+                    </article>
+                    <article class="admin-panel-card">
+                        <p class="admin-panel-card__label">Материалы</p>
+                        <p class="admin-panel-card__value">{{ materials_count }}</p>
+                    </article>
+                    <article class="admin-panel-card">
+                        <p class="admin-panel-card__label">Опубликовано</p>
+                        <p class="admin-panel-card__value">{{ published_materials_count }}</p>
+                    </article>
+                    <article class="admin-panel-card">
+                        <p class="admin-panel-card__label">Категории</p>
+                        <p class="admin-panel-card__value">{{ categories_count }}</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/">Вернуться на главную</a>
+        </div>
+    </footer>
+</body>
+</html>

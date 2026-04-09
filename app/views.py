@@ -10,7 +10,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import redirect, render
 
 from .forms import LoginForm, ProfileForm, RegisterForm
-from .models import LearningMaterial
+from .models import LearningMaterial, MaterialCategory, User, UserRole
 
 
 def landing(request):
@@ -124,3 +124,20 @@ def settings(request):
         "settings.html",
         {"profile_form": profile_form, "password_form": password_form},
     )
+
+
+@login_required
+def admin_panel(request):
+    """
+    Отображает кастомную панель администратора.
+    """
+    if request.user.role != UserRole.ADMINISTRATOR:
+        return redirect("landing")
+    context = {
+        "users_count": User.objects.count(),
+        "curators_count": User.objects.filter(role=UserRole.CURATOR).count(),
+        "materials_count": LearningMaterial.objects.count(),
+        "published_materials_count": LearningMaterial.objects.filter(is_published=True).count(),
+        "categories_count": MaterialCategory.objects.count(),
+    }
+    return render(request, "admin_panel.html", context)

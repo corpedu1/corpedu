@@ -35,6 +35,14 @@ class User(AbstractUser):
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
 
+    def save(self, *args, **kwargs):
+        """
+        Устанавливает роль администратора для суперпользователя.
+        """
+        if self.is_superuser:
+            self.role = UserRole.ADMINISTRATOR
+        super().save(*args, **kwargs)
+
     def __str__(self):
         """
         Возвращает отображаемое имя пользователя.
