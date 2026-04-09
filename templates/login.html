@@ -15,10 +15,18 @@
             <div class="container register-page__container">
                 <div class="register-form-container">
                     <p class="register-title">Вход</p>
-                    <form class="register-form" action="#" method="post">
+                    <form class="register-form" action="/login/" method="post">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="register-form-errors">
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         <div class="register-input-group">
                             <label for="login_username">Логин</label>
-                            <input type="text" name="username" id="login_username" placeholder="Введите логин">
+                            <input type="text" name="username" id="login_username" placeholder="Введите логин" value="{{ form.username.value|default:'' }}">
                         </div>
                         <div class="register-input-group">
                             <label for="login_password">Пароль</label>

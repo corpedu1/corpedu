@@ -124,6 +124,24 @@ a {
     color: #7dd3fc;
 }
 
+.topbar__user {
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.topbar__logout-form {
+    margin: 0;
+}
+
+.topbar__logout-button {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
 .button {
     display: inline-flex;
     align-items: center;
@@ -777,6 +795,27 @@ a {
 
 .register-signin a:hover {
     text-decoration: underline #a78bfa;
+}
+
+.register-form-errors {
+    margin-bottom: 10px;
+    border: 1px solid #7f1d1d;
+    border-radius: 8px;
+    background: rgba(127, 29, 29, 0.25);
+    padding: 8px 10px;
+}
+
+.register-form-errors p {
+    margin: 0;
+    color: #fecaca;
+    font-size: 0.86rem;
+}
+
+.register-field-error {
+    display: inline-block;
+    margin-top: 6px;
+    color: #fca5a5;
+    font-size: 0.82rem;
 }
 
 .register-page-layout .footer {

@@ -15,18 +15,29 @@
             <div class="container register-page__container">
                 <div class="register-form-container">
                     <p class="register-title">Регистрация</p>
-                    <form class="register-form" action="#" method="post">
+                    <form class="register-form" action="/register/" method="post">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="register-form-errors">
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         <div class="register-input-group">
                             <label for="register_login">Логин</label>
-                            <input type="text" name="login" id="register_login" placeholder="Введите логин">
+                            <input type="text" name="username" id="register_login" placeholder="Введите логин" value="{{ form.username.value|default:'' }}">
+                            {% if form.username.errors %}
+                                <span class="register-field-error">{{ form.username.errors.0 }}</span>
+                            {% endif %}
                         </div>
                         <div class="register-input-group">
                             <label for="register_name">Имя</label>
-                            <input type="text" name="name" id="register_name" placeholder="Введите имя">
+                            <input type="text" name="first_name" id="register_name" placeholder="Введите имя" value="{{ form.first_name.value|default:'' }}">
                         </div>
                         <div class="register-input-group">
                             <label for="register_surname">Фамилия</label>
-                            <input type="text" name="surname" id="register_surname" placeholder="Введите фамилию">
+                            <input type="text" name="last_name" id="register_surname" placeholder="Введите фамилию" value="{{ form.last_name.value|default:'' }}">
                         </div>
                         <div class="register-input-group">
                             <label for="register_password">Пароль</label>

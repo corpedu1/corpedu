@@ -2,7 +2,11 @@
 Представления проекта.
 """
 
-from django.shortcuts import render
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
+from django.shortcuts import redirect, render
+
+from .forms import LoginForm, RegisterForm
 
 
 def landing(request):
@@ -42,13 +46,41 @@ def faq(request):
 
 def register(request):
     """
-    Отображает страницу «Регистрация».
+    Отображает и обрабатывает страницу «Регистрация».
     """
-    return render(request, "register.html")
+    if request.user.is_authenticated:
+        return redirect("landing")
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_login(request, user)
+            return redirect("landing")
+    else:
+        form = RegisterForm()
+    return render(request, "register.html", {"form": form})
 
 
 def login(request):
     """
-    Отображает страницу «Вход».
+    Отображает и обрабатывает страницу «Вход».
     """
-    return render(request, "login.html")
+    if request.user.is_authenticated:
+        return redirect("landing")
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            auth_login(request, form.cleaned_data["user"])
+            return redirect("landing")
+    else:
+        form = LoginForm()
+    return render(request, "login.html", {"form": form})
+
+
+def logout(request):
+    """
+    Выполняет выход пользователя из системы.
+    """
+    if request.method == "POST":
+        auth_logout(request)
+    return redirect("landing")

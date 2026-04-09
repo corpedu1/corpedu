@@ -11,6 +11,7 @@ class UserRole(models.TextChoices):
     Роли пользователей платформы.
     """
 
+    USER = "user", "User"
     ADMINISTRATOR = "administrator", "Администратор"
     CURATOR = "curator", "Куратор"
     EMPLOYEE = "employee", "Сотрудник"
@@ -24,7 +25,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=20,
         choices=UserRole.choices,
-        default=UserRole.EMPLOYEE,
+        default=UserRole.USER,
         verbose_name="Роль",
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")

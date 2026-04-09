@@ -26,5 +26,6 @@ urlpatterns = [
     path('faq/', views.faq, name='faq'),
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
+    path('logout/', views.logout, name='logout'),
     path('admin/', admin.site.urls),
 ]
