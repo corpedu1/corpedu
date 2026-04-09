@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">Помощь</p>
+                <h1>FAQ</h1>
+                <p class="section-subtitle">Ответы на самые частые вопросы по работе с платформой.</p>
+
+                <div class="faq-list">
+                    <article class="faq-item is-open">
+                        <button class="faq-question" type="button" aria-expanded="true">
+                            <span>Как получить доступ к системе?</span>
+                            <span class="faq-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Доступ выдает администратор организации. После добавления учетной записи вы сможете войти через стандартную форму авторизации.</p>
+                        </div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>Какие роли существуют в сервисе?</span>
+                            <span class="faq-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>В системе предусмотрены три роли: администратор, куратор и сотрудник. Для каждой роли доступен отдельный набор функций.</p>
+                        </div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>Как проходит проверка знаний?</span>
+                            <span class="faq-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>После изучения материалов сотрудник проходит тест. Результаты фиксируются в системе и отображаются в аналитике.</p>
+                        </div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>Можно ли обновлять обучающие материалы?</span>
+                            <span class="faq-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Да, куратор может добавлять новые материалы и актуализировать существующие программы обучения.</p>
+                        </div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>Куда обращаться при технических проблемах?</span>
+                            <span class="faq-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Используйте страницу «Контакты» или форму «Обратная связь», чтобы отправить обращение в службу поддержки.</p>
+                        </div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>Сколько времени занимает прохождение одного модуля?</span>
+                            <span class="faq-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Средняя продолжительность одного учебного модуля составляет 15-30 минут, в зависимости от темы и сложности материала.</p>
+                        </div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>Можно ли проходить обучение с мобильного устройства?</span>
+                            <span class="faq-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Да, сервис адаптирован для смартфонов и планшетов, поэтому материалы и тесты доступны с мобильных устройств.</p>
+                        </div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>Как часто обновляются вопросы в тестах?</span>
+                            <span class="faq-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Кураторы регулярно обновляют банк вопросов с учетом изменений в учебных программах и актуальных рисков информационной безопасности.</p>
+                        </div>
+                    </article>
+                    <article class="faq-item">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>Где посмотреть историю прохождения и результаты?</span>
+                            <span class="faq-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Результаты и статус прохождения модулей доступны в личном кабинете сотрудника, а также в отчетах для куратора и администратора.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin/">Перейти к авторизации</a>
+        </div>
+    </footer>
+    <script src="{% static 'js/faq.js' %}"></script>
+</body>
+</html>

@@ -31,3 +31,10 @@ def feedback(request):
     Отображает страницу «Обратная связь».
     """
     return render(request, "feedback.html")
+
+
+def faq(request):
+    """
+    Отображает страницу «FAQ».
+    """
+    return render(request, "faq.html")

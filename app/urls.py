@@ -23,5 +23,6 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contacts/', views.contacts, name='contacts'),
     path('feedback/', views.feedback, name='feedback'),
+    path('faq/', views.faq, name='faq'),
     path('admin/', admin.site.urls),
 ]
