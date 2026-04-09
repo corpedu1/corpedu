@@ -8,8 +8,10 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import redirect, render
+from django.utils import timezone
+from django.utils.text import slugify
 
-from .forms import LoginForm, ProfileForm, RegisterForm
+from .forms import CuratorMaterialForm, LoginForm, ProfileForm, RegisterForm
 from .models import LearningMaterial, MaterialCategory, User, UserRole
 
 
@@ -25,6 +27,19 @@ def _is_curator(user):
     Проверяет, что пользователь является куратором.
     """
     return user.is_authenticated and user.role == UserRole.CURATOR
+
+
+def _build_unique_material_slug(title):
+    """
+    Формирует уникальный слаг для учебного материала.
+    """
+    base_slug = slugify(title) or "material"
+    slug = base_slug
+    index = 1
+    while LearningMaterial.objects.filter(slug=slug).exists():
+        index += 1
+        slug = f"{base_slug}-{index}"
+    return slug
 
 
 def landing(request):
@@ -218,3 +233,33 @@ def curator_panel(request):
         "draft_materials_count": LearningMaterial.objects.filter(author=request.user, is_published=False).count(),
     }
     return render(request, "curator_panel.html", context)
+
+
+@login_required
+def curator_material_create(request):
+    """
+    Отображает и обрабатывает страницу создания учебного материала.
+    """
+    if not _is_curator(request.user):
+        return redirect("landing")
+    success_message = ""
+    if request.method == "POST":
+        form = CuratorMaterialForm(request.POST)
+        if form.is_valid():
+            material = form.save(commit=False)
+            material.author = request.user
+            material.slug = _build_unique_material_slug(material.title)
+            if material.is_published:
+                material.published_at = timezone.now()
+            else:
+                material.published_at = None
+            material.save()
+            success_message = "Учебный материал успешно создан."
+            form = CuratorMaterialForm()
+    else:
+        form = CuratorMaterialForm()
+    return render(
+        request,
+        "curator_material_create.html",
+        {"form": form, "success_message": success_message},
+    )

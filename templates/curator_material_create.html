@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание материала | Панель куратора</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section admin-panel-page">
+            <div class="container">
+                <div class="admin-layout">
+                    {% include "partials/curator_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Куратор</p>
+                        <h1>Создание учебного материала</h1>
+                        <p class="section-subtitle">
+                            Заполните данные и сохраните новый материал для платформы.
+                        </p>
+
+                        <article class="admin-role-card">
+                            {% if success_message %}
+                                <div class="admin-success-message">
+                                    <p>{{ success_message }}</p>
+                                </div>
+                            {% endif %}
+
+                            {% if form.non_field_errors %}
+                                <div class="register-form-errors">
+                                    {% for error in form.non_field_errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <form method="post" action="/curator-panel/materials/create/" class="admin-role-form">
+                                {% csrf_token %}
+                                <div class="admin-role-form__group">
+                                    <label for="material_title">Заголовок</label>
+                                    <input type="text" name="title" id="material_title" value="{{ form.title.value|default:'' }}" required>
+                                </div>
+
+                                <div class="admin-role-form__group">
+                                    <label for="material_summary">Краткое описание</label>
+                                    <textarea name="summary" id="material_summary" rows="3">{{ form.summary.value|default:'' }}</textarea>
+                                </div>
+
+                                <div class="admin-role-form__group">
+                                    <label for="material_content">Содержание</label>
+                                    <textarea name="content" id="material_content" rows="8" required>{{ form.content.value|default:'' }}</textarea>
+                                </div>
+
+                                <div class="admin-role-form__group">
+                                    <label for="material_format">Формат</label>
+                                    <select name="material_format" id="material_format" required>
+                                        {% for value, label in form.fields.material_format.choices %}
+                                            <option value="{{ value }}" {% if form.material_format.value == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="admin-role-form__group">
+                                    <label for="material_category">Категория</label>
+                                    <select name="category" id="material_category" required>
+                                        <option value="">Выберите категорию</option>
+                                        {% for value, label in form.fields.category.choices %}
+                                            {% if value %}
+                                                <option value="{{ value }}" {% if form.category.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="admin-role-form__group">
+                                    <label for="material_minutes">Оценка времени, мин</label>
+                                    <input type="number" min="1" name="estimated_minutes" id="material_minutes" value="{{ form.estimated_minutes.value|default:'10' }}" required>
+                                </div>
+
+                                <label class="curator-checkbox">
+                                    <input type="checkbox" name="is_published" {% if form.is_published.value %}checked{% endif %}>
+                                    <span>Опубликовать сразу</span>
+                                </label>
+
+                                <button class="register-submit" type="submit">Сохранить материал</button>
+                            </form>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/curator-panel/">Вернуться в панель куратора</a>
+        </div>
+    </footer>
+</body>
+</html>

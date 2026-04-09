@@ -5,6 +5,8 @@
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
 
+from .models import LearningMaterial
+
 
 User = get_user_model()
 
@@ -83,3 +85,21 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ("first_name", "last_name")
+
+
+class CuratorMaterialForm(forms.ModelForm):
+    """
+    Форма создания учебного материала для куратора.
+    """
+
+    class Meta:
+        model = LearningMaterial
+        fields = (
+            "title",
+            "summary",
+            "content",
+            "material_format",
+            "category",
+            "estimated_minutes",
+            "is_published",
+        )

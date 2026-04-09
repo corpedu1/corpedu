@@ -13,25 +13,30 @@
     <main>
         <section class="section admin-panel-page">
             <div class="container">
-                <p class="section-kicker">Куратор</p>
-                <h1>Панель управления</h1>
-                <p class="section-subtitle">
-                    Сводная информация по вашим учебным материалам.
-                </p>
+                <div class="admin-layout">
+                    {% include "partials/curator_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Куратор</p>
+                        <h1>Панель управления</h1>
+                        <p class="section-subtitle">
+                            Сводная информация по вашим учебным материалам.
+                        </p>
 
-                <div class="admin-panel-grid">
-                    <article class="admin-panel-card">
-                        <p class="admin-panel-card__label">Всего материалов</p>
-                        <p class="admin-panel-card__value">{{ materials_count }}</p>
-                    </article>
-                    <article class="admin-panel-card">
-                        <p class="admin-panel-card__label">Опубликовано</p>
-                        <p class="admin-panel-card__value">{{ published_materials_count }}</p>
-                    </article>
-                    <article class="admin-panel-card">
-                        <p class="admin-panel-card__label">Черновики</p>
-                        <p class="admin-panel-card__value">{{ draft_materials_count }}</p>
-                    </article>
+                        <div class="admin-panel-grid">
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Всего материалов</p>
+                                <p class="admin-panel-card__value">{{ materials_count }}</p>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Опубликовано</p>
+                                <p class="admin-panel-card__value">{{ published_materials_count }}</p>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Черновики</p>
+                                <p class="admin-panel-card__value">{{ draft_materials_count }}</p>
+                            </article>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
