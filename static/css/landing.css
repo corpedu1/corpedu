@@ -1182,6 +1182,45 @@ a {
     color: #f0fdfa;
 }
 
+.admin-category-row {
+    align-items: stretch;
+}
+
+.admin-category-row__fields {
+    flex: 1 1 auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    display: grid;
+}
+
+.admin-save-button {
+    background: #0ea5a5;
+    border: 1px solid #0ea5a5;
+    color: #ecfeff;
+}
+
+.admin-save-button:hover {
+    background: #0f766e;
+    border-color: #0f766e;
+    color: #f0fdfa;
+}
+
+.admin-delete-button {
+    background: #7f1d1d;
+    border: 1px solid #7f1d1d;
+    color: #fee2e2;
+}
+
+.admin-delete-button:hover {
+    background: #991b1b;
+    border-color: #991b1b;
+    color: #ffffff;
+}
+
+.admin-message-space {
+    margin-top: 14px;
+}
+
 .settings-page__container {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1596,6 +1635,10 @@ a {
     .admin-user-row__actions select,
     .admin-user-row .register-submit {
         width: 100%;
+    }
+
+    .admin-category-row__fields {
+        grid-template-columns: 1fr;
     }
 
     .about-page .about-intro__layout {

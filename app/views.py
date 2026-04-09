@@ -7,6 +7,8 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core.exceptions import ValidationError
+from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.utils.text import slugify
@@ -37,6 +39,22 @@ def _build_unique_material_slug(title):
     slug = base_slug
     index = 1
     while LearningMaterial.objects.filter(slug=slug).exists():
+        index += 1
+        slug = f"{base_slug}-{index}"
+    return slug
+
+
+def _build_unique_category_slug(name, current_id=None):
+    """
+    Формирует уникальный слаг для категории.
+    """
+    base_slug = slugify(name) or "category"
+    slug = base_slug
+    index = 1
+    queryset = MaterialCategory.objects.all()
+    if current_id is not None:
+        queryset = queryset.exclude(pk=current_id)
+    while queryset.filter(slug=slug).exists():
         index += 1
         slug = f"{base_slug}-{index}"
     return slug
@@ -218,6 +236,74 @@ def admin_user_roles(request):
         "selected_role": selected_role,
     }
     return render(request, "admin_user_roles.html", context)
+
+
+@login_required
+def admin_material_categories(request):
+    """
+    Отображает и обрабатывает страницу управления категориями материалов.
+    """
+    if not _is_administrator(request.user):
+        return redirect("landing")
+    error_message = ""
+    success_message = ""
+    if request.method == "POST":
+        action = request.POST.get("action", "").strip()
+        if action == "create":
+            name = request.POST.get("name", "").strip()
+            description = request.POST.get("description", "").strip()
+            if not name:
+                error_message = "Введите название категории."
+            else:
+                category = MaterialCategory(
+                    name=name,
+                    slug=_build_unique_category_slug(name),
+                    description=description,
+                )
+                try:
+                    category.full_clean()
+                    category.save()
+                    success_message = "Категория успешно создана."
+                except ValidationError as error:
+                    error_message = "; ".join(error.messages)
+        elif action in {"update", "delete"}:
+            category_id = request.POST.get("category_id", "").strip()
+            try:
+                category = MaterialCategory.objects.get(pk=category_id)
+            except MaterialCategory.DoesNotExist:
+                error_message = "Категория не найдена."
+            else:
+                if action == "delete":
+                    try:
+                        category.delete()
+                        success_message = "Категория успешно удалена."
+                    except ProtectedError:
+                        error_message = "Нельзя удалить категорию, к которой привязаны материалы."
+                else:
+                    name = request.POST.get("name", "").strip()
+                    description = request.POST.get("description", "").strip()
+                    if not name:
+                        error_message = "Название категории не может быть пустым."
+                    else:
+                        category.name = name
+                        category.slug = _build_unique_category_slug(name, current_id=category.id)
+                        category.description = description
+                        try:
+                            category.full_clean()
+                            category.save()
+                            success_message = "Категория успешно обновлена."
+                        except ValidationError as error:
+                            error_message = "; ".join(error.messages)
+    categories = MaterialCategory.objects.order_by("name")
+    return render(
+        request,
+        "admin_material_categories.html",
+        {
+            "categories": categories,
+            "error_message": error_message,
+            "success_message": success_message,
+        },
+    )
 
 
 @login_required
