@@ -10,9 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
         rows.forEach((row) => {
             const login = row.dataset.login || "";
             const isMatch = query === "" || login.includes(query);
-            row.hidden = !isMatch;
+            row.style.display = isMatch ? "flex" : "none";
         });
     };
 
     searchInput.addEventListener("input", applyFilter);
+    searchInput.addEventListener("keyup", applyFilter);
+    applyFilter();
 });
