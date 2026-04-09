@@ -20,6 +20,13 @@ def _is_administrator(user):
     return user.is_authenticated and user.role == UserRole.ADMINISTRATOR
 
 
+def _is_curator(user):
+    """
+    Проверяет, что пользователь является куратором.
+    """
+    return user.is_authenticated and user.role == UserRole.CURATOR
+
+
 def landing(request):
     """
     Отображает главную страницу веб-сервиса.
@@ -196,3 +203,18 @@ def admin_user_roles(request):
         "selected_role": selected_role,
     }
     return render(request, "admin_user_roles.html", context)
+
+
+@login_required
+def curator_panel(request):
+    """
+    Отображает панель управления куратора.
+    """
+    if not _is_curator(request.user):
+        return redirect("landing")
+    context = {
+        "materials_count": LearningMaterial.objects.filter(author=request.user).count(),
+        "published_materials_count": LearningMaterial.objects.filter(author=request.user, is_published=True).count(),
+        "draft_materials_count": LearningMaterial.objects.filter(author=request.user, is_published=False).count(),
+    }
+    return render(request, "curator_panel.html", context)

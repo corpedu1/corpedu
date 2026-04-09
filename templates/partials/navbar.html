@@ -18,6 +18,8 @@
                 <div class="topbar__user-menu" data-user-menu>
                     {% if request.user.role == "administrator" %}
                         <a class="topbar__user-menu-link" href="/admin-panel/">Админ панель</a>
+                    {% elif request.user.role == "curator" %}
+                        <a class="topbar__user-menu-link" href="/curator-panel/">Панель управления</a>
                     {% endif %}
                     <a class="topbar__user-menu-link" href="/settings/">Настройки</a>
                 </div>
