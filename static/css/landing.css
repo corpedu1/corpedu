@@ -957,6 +957,39 @@ a {
     padding: 56px 0;
 }
 
+.about-page .about-profile-section {
+    background: #0f1f3a;
+}
+
+.about-page .about-profile-section .section-kicker {
+    color: #93c5fd;
+}
+
+.about-page .about-profile-section h2 {
+    color: #f8fafc;
+    font-size: clamp(1.9rem, 2.9vw, 2.4rem);
+}
+
+.about-page .about-profile-section .section-subtitle {
+    color: #b8c4d6;
+    font-size: 1.08rem;
+    line-height: 1.72;
+    font-weight: 400;
+}
+
+.about-page .about-profile-section .about-parallel__item h3 {
+    color: #e2e8f0;
+    font-size: 1.24rem;
+    margin-bottom: 10px;
+}
+
+.about-page .about-profile-section .about-parallel__item p {
+    color: #c3d0e4;
+    font-size: 1.03rem;
+    line-height: 1.78;
+    font-weight: 400;
+}
+
 .about-page .about-rows {
     display: grid;
     gap: 12px;
