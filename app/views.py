@@ -38,3 +38,10 @@ def faq(request):
     Отображает страницу «FAQ».
     """
     return render(request, "faq.html")
+
+
+def register(request):
+    """
+    Отображает страницу «Регистрация».
+    """
+    return render(request, "register.html")
