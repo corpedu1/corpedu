@@ -1054,6 +1054,64 @@ a {
     margin-bottom: 10px;
 }
 
+.material-detail-attachment {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin-top: 12px;
+    margin-bottom: 14px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #bae6fd;
+    background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 1px 2px rgba(14, 165, 233, 0.08);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.material-detail-attachment:hover {
+    border-color: #38bdf8;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.12);
+}
+
+.material-detail-attachment__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #0369a1;
+    flex-shrink: 0;
+}
+
+.material-detail-attachment__name {
+    font-size: 0.88rem;
+    color: #0f172a;
+    font-weight: 500;
+    min-width: 0;
+    word-break: break-word;
+    flex: 1 1 140px;
+}
+
+.material-detail-attachment__cta {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #0284c7;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid #7dd3fc;
+}
+
+.material-detail-attachment:hover .material-detail-attachment__cta {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0284c7;
+}
+
 .material-detail-meta {
     margin-top: 16px;
     display: flex;
@@ -1069,8 +1127,7 @@ a {
     padding: 6px 10px;
 }
 
-.material-detail-content,
-.material-detail-file {
+.material-detail-content {
     margin-top: 18px;
     border: 1px solid #dbe5ef;
     border-radius: 12px;
@@ -1078,40 +1135,13 @@ a {
     padding: 16px;
 }
 
-.material-detail-content h3,
-.material-detail-file h3 {
+.material-detail-content h3 {
     margin-bottom: 10px;
 }
 
 .material-detail-content p {
     color: #334155;
     line-height: 1.7;
-}
-
-.material-detail-file p {
-    color: #334155;
-    line-height: 1.7;
-}
-
-.material-detail-file a,
-.material-detail-file-link {
-    color: #0284c7;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.material-detail-file a:hover,
-.material-detail-file-link:hover {
-    text-decoration: underline;
-}
-
-.material-detail-file-link-name {
-    font-weight: 500;
-    color: #0f172a;
-}
-
-.material-detail-file-download {
-    margin: 0;
 }
 
 .curator-material-list {

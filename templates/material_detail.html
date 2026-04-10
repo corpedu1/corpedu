@@ -15,6 +15,17 @@
             <div class="container">
                 <p class="section-kicker">{{ material.category.name }}</p>
                 <h1>{{ material.title }}</h1>
+
+                {% if material.attachment %}
+                    <a class="material-detail-attachment" href="{{ material.attachment.url }}"{% if material.attachment_display_name %} download="{{ material.attachment_display_name }}"{% endif %} rel="noopener noreferrer">
+                        <span class="material-detail-attachment__label">Прикреплённый файл</span>
+                        {% if material.attachment_display_name %}
+                            <span class="material-detail-attachment__name">{{ material.attachment_display_name }}</span>
+                        {% endif %}
+                        <span class="material-detail-attachment__cta">Скачать</span>
+                    </a>
+                {% endif %}
+
                 <p class="section-subtitle">{{ material.summary|default:"Описание материала отсутствует." }}</p>
 
                 <div class="material-detail-meta">
@@ -27,17 +38,6 @@
                     <h3>Содержание</h3>
                     <p>{{ material.content|linebreaksbr }}</p>
                 </article>
-
-                {% if material.attachment %}
-                    <article class="material-detail-file">
-                        <h3>Прикреплённый файл</h3>
-                        <p class="material-detail-file-download">
-                            <a href="{{ material.attachment.url }}"{% if material.attachment_display_name %} download="{{ material.attachment_display_name }}"{% endif %} class="material-detail-file-link" rel="noopener noreferrer">
-                                <span class="material-detail-file-link-text">Скачать файл</span>{% if material.attachment_display_name %}<span class="material-detail-file-link-name"> — {{ material.attachment_display_name }}</span>{% endif %}
-                            </a>
-                        </p>
-                    </article>
-                {% endif %}
             </div>
         </section>
     </main>
