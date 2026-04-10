@@ -4,8 +4,9 @@
 
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
+from django.forms import inlineformset_factory
 
-from .models import LearningMaterial
+from .models import LearningMaterial, MaterialPage
 
 
 User = get_user_model()
@@ -97,7 +98,6 @@ class CuratorMaterialForm(forms.ModelForm):
         fields = (
             "title",
             "summary",
-            "content",
             "attachment",
             "material_format",
             "category",
@@ -116,3 +116,56 @@ class CuratorMaterialForm(forms.ModelForm):
         if not (filename.endswith(".pdf") or filename.endswith(".docx")):
             raise forms.ValidationError("Разрешены только файлы PDF или DOCX.")
         return attachment
+
+
+class MaterialPageForm(forms.ModelForm):
+    """
+    Одна страница материала: текст, изображение, опциональный мини-тест.
+    """
+
+    class Meta:
+        model = MaterialPage
+        fields = (
+            "title",
+            "body",
+            "image",
+            "quiz_question",
+            "quiz_choice_1",
+            "quiz_choice_2",
+            "quiz_choice_3",
+            "quiz_choice_4",
+            "quiz_correct",
+        )
+        widgets = {
+            "title": forms.TextInput(attrs={"placeholder": "Необязательно"}),
+            "body": forms.Textarea(attrs={"rows": 8, "class": "material-page-body"}),
+            "quiz_question": forms.Textarea(attrs={"rows": 2}),
+            "quiz_choice_1": forms.Textarea(attrs={"rows": 1}),
+            "quiz_choice_2": forms.Textarea(attrs={"rows": 1}),
+            "quiz_choice_3": forms.Textarea(attrs={"rows": 1}),
+            "quiz_choice_4": forms.Textarea(attrs={"rows": 1}),
+            "quiz_correct": forms.Select(
+                choices=[("", "—")] + [(i, str(i)) for i in range(1, 5)]
+            ),
+        }
+
+    def clean_image(self):
+        image = self.cleaned_data.get("image")
+        if not image:
+            return image
+        name = getattr(image, "name", "") or ""
+        lower = name.lower()
+        if not lower.endswith((".jpg", ".jpeg", ".png", ".gif", ".webp")):
+            raise forms.ValidationError("Допустимы изображения: JPG, PNG, GIF, WEBP.")
+        return image
+
+
+MaterialPageFormSet = inlineformset_factory(
+    LearningMaterial,
+    MaterialPage,
+    form=MaterialPageForm,
+    extra=1,
+    can_delete=True,
+    min_num=1,
+    validate_min=True,
+)

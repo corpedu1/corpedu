@@ -13,7 +13,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.text import slugify
 
-from .forms import CuratorMaterialForm, LoginForm, ProfileForm, RegisterForm
+from .forms import (
+    CuratorMaterialForm,
+    LoginForm,
+    MaterialPageFormSet,
+    ProfileForm,
+    RegisterForm,
+)
 from .models import LearningMaterial, MaterialCategory, User, UserRole
 
 
@@ -45,6 +51,19 @@ def _build_unique_material_slug(title, current_id=None):
         index += 1
         slug = f"{base_slug}-{index}"
     return slug
+
+
+def _save_material_page_formset(formset):
+    """
+    Сохраняет страницы материала и выставляет порядок по порядку форм.
+    """
+    instances = formset.save(commit=False)
+    for obj in formset.deleted_objects:
+        obj.delete()
+    for i, obj in enumerate(instances):
+        obj.order = i
+        obj.save()
+    formset.save_m2m()
 
 
 def _build_unique_category_slug(name, current_id=None):
@@ -111,7 +130,7 @@ def material_detail(request, slug):
     Отображает страницу детального просмотра обучающего материала.
     """
     material = get_object_or_404(
-        LearningMaterial.objects.select_related("category", "author"),
+        LearningMaterial.objects.select_related("category", "author").prefetch_related("pages"),
         slug=slug,
     )
     can_view_draft = request.user.is_authenticated and (
@@ -120,7 +139,34 @@ def material_detail(request, slug):
     )
     if not material.is_published and not can_view_draft:
         return redirect("materials")
-    return render(request, "material_detail.html", {"material": material})
+    pages = list(material.pages.all())
+    total_pages = len(pages)
+    try:
+        page_index = max(1, int(request.GET.get("page", 1)))
+    except (TypeError, ValueError):
+        page_index = 1
+    if total_pages == 0:
+        current_page = None
+        page_index = 0
+    else:
+        if page_index > total_pages:
+            page_index = total_pages
+        current_page = pages[page_index - 1]
+    prev_page = page_index - 1 if page_index > 1 else None
+    next_page = page_index + 1 if total_pages and page_index < total_pages else None
+    return render(
+        request,
+        "material_detail.html",
+        {
+            "material": material,
+            "pages": pages,
+            "current_page": current_page,
+            "page_index": page_index,
+            "total_pages": total_pages,
+            "prev_page": prev_page,
+            "next_page": next_page,
+        },
+    )
 
 
 def register(request):
@@ -349,6 +395,7 @@ def curator_material_create(request):
     if not _is_curator(request.user):
         return redirect("landing")
     success_message = ""
+    error_message = ""
     if request.method == "POST":
         form = CuratorMaterialForm(request.POST, request.FILES)
         if form.is_valid():
@@ -359,15 +406,33 @@ def curator_material_create(request):
                 material.published_at = timezone.now()
             else:
                 material.published_at = None
+            material.content = ""
             material.save()
-            success_message = "Учебный материал успешно создан."
-            form = CuratorMaterialForm()
+            page_formset = MaterialPageFormSet(request.POST, request.FILES, instance=material)
+            if page_formset.is_valid():
+                _save_material_page_formset(page_formset)
+                success_message = "Учебный материал успешно создан."
+                form = CuratorMaterialForm()
+                page_formset = MaterialPageFormSet(instance=LearningMaterial())
+            else:
+                material.delete()
+                error_message = "Исправьте ошибки в блоках страниц (нужна хотя бы одна страница)."
+                form = CuratorMaterialForm(request.POST, request.FILES)
+                page_formset = MaterialPageFormSet(request.POST, request.FILES)
+        else:
+            page_formset = MaterialPageFormSet(request.POST, request.FILES)
     else:
         form = CuratorMaterialForm()
+        page_formset = MaterialPageFormSet(instance=LearningMaterial())
     return render(
         request,
         "curator_material_create.html",
-        {"form": form, "success_message": success_message},
+        {
+            "form": form,
+            "page_formset": page_formset,
+            "success_message": success_message,
+            "error_message": error_message,
+        },
     )
 
 
@@ -389,9 +454,15 @@ def curator_material_edit(request, slug):
     """
     if not _is_curator(request.user):
         return redirect("landing")
-    material = get_object_or_404(LearningMaterial, slug=slug, author=request.user)
+    material = get_object_or_404(
+        LearningMaterial.objects.prefetch_related("pages"),
+        slug=slug,
+        author=request.user,
+    )
     success_message = ""
     error_message = ""
+    form = CuratorMaterialForm(instance=material)
+    page_formset = MaterialPageFormSet(instance=material)
     if request.method == "POST":
         action = request.POST.get("action", "").strip()
         if action == "delete":
@@ -401,9 +472,12 @@ def curator_material_edit(request, slug):
             material.attachment = None
             material.save(update_fields=["attachment"])
             success_message = "Файл удален."
+            form = CuratorMaterialForm(instance=material)
+            page_formset = MaterialPageFormSet(instance=material)
         else:
             form = CuratorMaterialForm(request.POST, request.FILES, instance=material)
-            if form.is_valid():
+            page_formset = MaterialPageFormSet(request.POST, request.FILES, instance=material)
+            if form.is_valid() and page_formset.is_valid():
                 updated = form.save(commit=False)
                 updated.author = request.user
                 updated.slug = _build_unique_material_slug(updated.title, current_id=updated.id)
@@ -412,26 +486,19 @@ def curator_material_edit(request, slug):
                 if not updated.is_published:
                     updated.published_at = None
                 updated.save()
+                _save_material_page_formset(page_formset)
                 success_message = "Материал обновлен."
-                form = CuratorMaterialForm(instance=updated)
+                material = updated
+                form = CuratorMaterialForm(instance=material)
+                page_formset = MaterialPageFormSet(instance=material)
             else:
-                error_message = "Проверьте корректность заполнения формы."
-                return render(
-                    request,
-                    "curator_material_edit.html",
-                    {
-                        "form": form,
-                        "material": material,
-                        "error_message": error_message,
-                        "success_message": success_message,
-                    },
-                )
-    form = CuratorMaterialForm(instance=material)
+                error_message = "Проверьте корректность заполнения формы и страниц."
     return render(
         request,
         "curator_material_edit.html",
         {
             "form": form,
+            "page_formset": page_formset,
             "material": material,
             "error_message": error_message,
             "success_message": success_message,

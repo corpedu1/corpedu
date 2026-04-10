@@ -28,6 +28,9 @@
                                     <p>{{ success_message }}</p>
                                 </div>
                             {% endif %}
+                            {% if error_message %}
+                                <div class="register-form-errors admin-message-space"><p>{{ error_message }}</p></div>
+                            {% endif %}
 
                             {% if form.non_field_errors %}
                                 <div class="register-form-errors">
@@ -47,11 +50,6 @@
                                 <div class="admin-role-form__group">
                                     <label for="material_summary">Краткое описание</label>
                                     <textarea name="summary" id="material_summary" rows="3">{{ form.summary.value|default:'' }}</textarea>
-                                </div>
-
-                                <div class="admin-role-form__group">
-                                    <label for="material_content">Содержание</label>
-                                    <textarea name="content" id="material_content" rows="8" required>{{ form.content.value|default:'' }}</textarea>
                                 </div>
 
                                 <div class="admin-role-form__group">
@@ -89,6 +87,75 @@
                                     <input type="checkbox" name="is_published" {% if form.is_published.value %}checked{% endif %}>
                                     <span>Опубликовать сразу</span>
                                 </label>
+
+                                <h2 class="material-pages-editor__heading">Страницы материала</h2>
+                                <p class="section-subtitle material-pages-editor__hint">Добавьте одну или несколько страниц. Текст без ограничения по объёму. На каждой странице можно загрузить изображение и опционально мини-тест (вопрос и 4 варианта).</p>
+
+                                {{ page_formset.management_form }}
+                                {% if page_formset.non_form_errors %}
+                                    <div class="register-form-errors">{% for err in page_formset.non_form_errors %}<p>{{ err }}</p>{% endfor %}</div>
+                                {% endif %}
+
+                                {% for pform in page_formset %}
+                                    <div class="material-page-editor">
+                                        {% for hidden in pform.hidden_fields %}{{ hidden }}{% endfor %}
+                                        <h3 class="material-page-editor__title">Страница {{ forloop.counter }}</h3>
+                                        {% if page_formset.can_delete and pform.instance.pk %}
+                                            <label class="curator-checkbox material-page-editor__delete">
+                                                {{ pform.DELETE }} <span>Удалить страницу</span>
+                                            </label>
+                                        {% endif %}
+                                        <div class="admin-role-form__group">
+                                            <label for="{{ pform.title.id_for_label }}">Заголовок страницы (необязательно)</label>
+                                            {{ pform.title }}
+                                            {% if pform.title.errors %}<span class="field-error">{{ pform.title.errors.0 }}</span>{% endif %}
+                                        </div>
+                                        <div class="admin-role-form__group">
+                                            <label for="{{ pform.body.id_for_label }}">Текст страницы</label>
+                                            {{ pform.body }}
+                                            {% if pform.body.errors %}<span class="field-error">{{ pform.body.errors.0 }}</span>{% endif %}
+                                        </div>
+                                        <div class="admin-role-form__group">
+                                            <label for="{{ pform.image.id_for_label }}">Изображение (JPG, PNG, GIF, WEBP)</label>
+                                            {{ pform.image }}
+                                            {% if pform.instance.image %}
+                                                <p class="material-page-editor__preview"><img src="{{ pform.instance.image.url }}" alt="" class="material-page-editor__thumb"></p>
+                                            {% endif %}
+                                            {% if pform.image.errors %}<span class="field-error">{{ pform.image.errors.0 }}</span>{% endif %}
+                                        </div>
+                                        <p class="material-page-editor__quiz-title">Мини-тест (необязательно)</p>
+                                        <div class="admin-role-form__group">
+                                            <label for="{{ pform.quiz_question.id_for_label }}">Вопрос</label>
+                                            {{ pform.quiz_question }}
+                                        </div>
+                                        <div class="admin-role-form__grid2">
+                                            <div class="admin-role-form__group">
+                                                <label for="{{ pform.quiz_choice_1.id_for_label }}">Вариант 1</label>
+                                                {{ pform.quiz_choice_1 }}
+                                            </div>
+                                            <div class="admin-role-form__group">
+                                                <label for="{{ pform.quiz_choice_2.id_for_label }}">Вариант 2</label>
+                                                {{ pform.quiz_choice_2 }}
+                                            </div>
+                                            <div class="admin-role-form__group">
+                                                <label for="{{ pform.quiz_choice_3.id_for_label }}">Вариант 3</label>
+                                                {{ pform.quiz_choice_3 }}
+                                            </div>
+                                            <div class="admin-role-form__group">
+                                                <label for="{{ pform.quiz_choice_4.id_for_label }}">Вариант 4</label>
+                                                {{ pform.quiz_choice_4 }}
+                                            </div>
+                                        </div>
+                                        <div class="admin-role-form__group">
+                                            <label for="{{ pform.quiz_correct.id_for_label }}">Верный ответ (номер)</label>
+                                            {{ pform.quiz_correct }}
+                                            {% if pform.quiz_correct.errors %}<span class="field-error">{{ pform.quiz_correct.errors.0 }}</span>{% endif %}
+                                        </div>
+                                        {% if pform.non_field_errors %}
+                                            <div class="register-form-errors">{% for err in pform.non_field_errors %}<p>{{ err }}</p>{% endfor %}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
 
                                 <button class="register-submit" type="submit">Сохранить материал</button>
                             </form>

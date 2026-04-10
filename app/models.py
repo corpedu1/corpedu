@@ -5,6 +5,7 @@
 import os
 
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -96,7 +97,7 @@ class LearningMaterial(models.Model):
     title = models.CharField(max_length=255, verbose_name="Заголовок")
     slug = models.SlugField(max_length=280, unique=True, verbose_name="Слаг")
     summary = models.TextField(blank=True, verbose_name="Краткое описание")
-    content = models.TextField(verbose_name="Содержание")
+    content = models.TextField(blank=True, verbose_name="Содержание (устаревшее, для совместимости)")
     attachment = models.FileField(
         upload_to="materials/attachments/",
         null=True,
@@ -146,3 +147,79 @@ class LearningMaterial(models.Model):
         if not self.attachment or not getattr(self.attachment, "name", ""):
             return ""
         return os.path.basename(self.attachment.name) or ""
+
+
+class MaterialPage(models.Model):
+    """
+    Страница учебного материала (многостраничный контент).
+    """
+
+    material = models.ForeignKey(
+        LearningMaterial,
+        on_delete=models.CASCADE,
+        related_name="pages",
+        verbose_name="Материал",
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    title = models.CharField(max_length=255, blank=True, verbose_name="Заголовок страницы")
+    body = models.TextField(blank=True, verbose_name="Текст страницы")
+    image = models.ImageField(
+        upload_to="materials/pages/",
+        null=True,
+        blank=True,
+        verbose_name="Изображение",
+    )
+    quiz_question = models.TextField(blank=True, verbose_name="Вопрос мини-теста")
+    quiz_choice_1 = models.TextField(blank=True, verbose_name="Вариант 1")
+    quiz_choice_2 = models.TextField(blank=True, verbose_name="Вариант 2")
+    quiz_choice_3 = models.TextField(blank=True, verbose_name="Вариант 3")
+    quiz_choice_4 = models.TextField(blank=True, verbose_name="Вариант 4")
+    quiz_correct = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        choices=((1, "1"), (2, "2"), (3, "3"), (4, "4")),
+        verbose_name="Верный ответ (номер варианта)",
+    )
+
+    class Meta:
+        verbose_name = "Страница материала"
+        verbose_name_plural = "Страницы материала"
+        ordering = ("order", "id")
+
+    def __str__(self):
+        return f"{self.material_id} · {self.title or self.order}"
+
+    def clean(self):
+        has_q = bool(self.quiz_question and self.quiz_question.strip())
+        has_any_choice = any(
+            [
+                bool(self.quiz_choice_1 and str(self.quiz_choice_1).strip()),
+                bool(self.quiz_choice_2 and str(self.quiz_choice_2).strip()),
+                bool(self.quiz_choice_3 and str(self.quiz_choice_3).strip()),
+                bool(self.quiz_choice_4 and str(self.quiz_choice_4).strip()),
+            ]
+        )
+        if has_q or has_any_choice or self.quiz_correct is not None:
+            if not has_q:
+                raise ValidationError({"quiz_question": "Укажите текст вопроса или очистите поля теста."})
+            for i, label in enumerate(
+                ("quiz_choice_1", "quiz_choice_2", "quiz_choice_3", "quiz_choice_4"), start=1
+            ):
+                val = getattr(self, label)
+                if not val or not str(val).strip():
+                    raise ValidationError({label: f"Заполните все четыре варианта (пустой вариант {i})."})
+            if self.quiz_correct not in (1, 2, 3, 4):
+                raise ValidationError({"quiz_correct": "Укажите номер верного ответа (1–4)."})
+
+    @property
+    def has_quiz(self):
+        return bool(self.quiz_question and str(self.quiz_question).strip() and self.quiz_correct in (1, 2, 3, 4))
+
+    @property
+    def quiz_choices_list(self):
+        return [
+            (1, self.quiz_choice_1 or ""),
+            (2, self.quiz_choice_2 or ""),
+            (3, self.quiz_choice_3 or ""),
+            (4, self.quiz_choice_4 or ""),
+        ]

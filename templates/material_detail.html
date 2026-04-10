@@ -34,10 +34,67 @@
                     <span>Оценка времени: {{ material.estimated_minutes }} мин</span>
                 </div>
 
-                <article class="material-detail-content">
-                    <h3>Содержание</h3>
-                    <p>{{ material.content|linebreaksbr }}</p>
-                </article>
+                {% if total_pages %}
+                    <nav class="material-page-nav" aria-label="Страницы материала">
+                        <span class="material-page-nav__label">Страница {{ page_index }} из {{ total_pages }}</span>
+                        <div class="material-page-nav__links">
+                            {% if prev_page %}
+                                <a class="material-page-nav__btn" href="?page={{ prev_page }}">← Назад</a>
+                            {% else %}
+                                <span class="material-page-nav__btn material-page-nav__btn--disabled">← Назад</span>
+                            {% endif %}
+                            {% if next_page %}
+                                <a class="material-page-nav__btn" href="?page={{ next_page }}">Вперёд →</a>
+                            {% else %}
+                                <span class="material-page-nav__btn material-page-nav__btn--disabled">Вперёд →</span>
+                            {% endif %}
+                        </div>
+                    </nav>
+
+                    <article class="material-detail-content material-detail-page-body">
+                        {% if current_page.title %}
+                            <h3>{{ current_page.title }}</h3>
+                        {% else %}
+                            <h3>Страница {{ page_index }}</h3>
+                        {% endif %}
+                        {% if current_page.image %}
+                            <figure class="material-page-figure">
+                                <img src="{{ current_page.image.url }}" alt="" class="material-page-image" loading="lazy" width="800">
+                            </figure>
+                        {% endif %}
+                        <div class="material-page-text">{{ current_page.body|linebreaksbr }}</div>
+
+                        {% if current_page.has_quiz %}
+                            <div class="material-page-quiz" data-correct="{{ current_page.quiz_correct }}">
+                                <h4 class="material-page-quiz__title">Мини-тест</h4>
+                                <p class="material-page-quiz__q">{{ current_page.quiz_question|linebreaksbr }}</p>
+                                <ul class="material-page-quiz__choices">
+                                    {% for num, text in current_page.quiz_choices_list %}
+                                        {% if text %}
+                                            <li>
+                                                <label class="material-page-quiz__label">
+                                                    <input type="radio" name="quiz-p{{ current_page.pk }}" value="{{ num }}" class="material-page-quiz__input">
+                                                    <span>{{ num }}. {{ text }}</span>
+                                                </label>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                <button type="button" class="material-page-quiz__check">Проверить ответ</button>
+                                <p class="material-page-quiz__feedback" hidden></p>
+                            </div>
+                        {% endif %}
+                    </article>
+                {% elif material.content %}
+                    <article class="material-detail-content">
+                        <h3>Содержание</h3>
+                        <p>{{ material.content|linebreaksbr }}</p>
+                    </article>
+                {% else %}
+                    <article class="material-detail-content material-detail-content--empty">
+                        <p>Текст материала пока не добавлен.</p>
+                    </article>
+                {% endif %}
             </div>
         </section>
     </main>
@@ -48,5 +105,32 @@
             <a href="/materials/">Вернуться к списку материалов</a>
         </div>
     </footer>
+    <script>
+    document.querySelectorAll(".material-page-quiz").forEach(function (root) {
+        var correct = parseInt(root.getAttribute("data-correct"), 10);
+        var feedback = root.querySelector(".material-page-quiz__feedback");
+        var btn = root.querySelector(".material-page-quiz__check");
+        var inputs = root.querySelectorAll(".material-page-quiz__input");
+        if (!btn || !feedback || !inputs.length) return;
+        btn.addEventListener("click", function () {
+            var sel = root.querySelector(".material-page-quiz__input:checked");
+            if (!sel) {
+                feedback.hidden = false;
+                feedback.textContent = "Выберите вариант ответа.";
+                feedback.className = "material-page-quiz__feedback material-page-quiz__feedback--warn";
+                return;
+            }
+            var v = parseInt(sel.value, 10);
+            feedback.hidden = false;
+            if (v === correct) {
+                feedback.textContent = "Верно.";
+                feedback.className = "material-page-quiz__feedback material-page-quiz__feedback--ok";
+            } else {
+                feedback.textContent = "Неверно. Попробуйте ещё раз.";
+                feedback.className = "material-page-quiz__feedback material-page-quiz__feedback--bad";
+            }
+        });
+    });
+    </script>
 </body>
 </html>
