@@ -2,6 +2,8 @@
 Модели базы данных проекта.
 """
 
+import os
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -136,10 +138,10 @@ class LearningMaterial(models.Model):
         """
         return self.title
 
-    def is_pdf_attachment(self):
+    def attachment_display_name(self):
         """
-        Проверяет, является ли прикрепленный файл PDF.
+        Имя прикреплённого файла для отображения и скачивания.
         """
         if not self.attachment:
-            return False
-        return self.attachment.name.lower().endswith(".pdf")
+            return ""
+        return os.path.basename(self.attachment.name)

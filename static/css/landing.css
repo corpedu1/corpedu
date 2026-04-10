@@ -1097,17 +1097,8 @@ a {
     text-decoration: underline;
 }
 
-.material-detail-pdf-wrap {
-    margin-top: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.material-detail-pdf {
-    width: 100%;
-    height: 640px;
-    border: 0;
+.material-detail-file-download {
+    margin: 0;
 }
 
 .curator-material-list {

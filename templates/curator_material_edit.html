@@ -79,7 +79,7 @@
                         {% if material.attachment %}
                             <article class="admin-role-card admin-message-space">
                                 <h3>Прикрепленный файл</h3>
-                                <p><a href="{{ material.attachment.url }}" target="_blank" rel="noopener noreferrer">Открыть текущий файл</a></p>
+                                <p><a href="{{ material.attachment.url }}" download="{{ material.attachment_display_name }}" rel="noopener noreferrer">Скачать текущий файл</a></p>
                                 <form method="post" action="/curator-panel/materials/{{ material.slug }}/">
                                     {% csrf_token %}
                                     <button class="register-submit admin-delete-button" type="submit" name="action" value="remove_attachment">Удалить файл</button>

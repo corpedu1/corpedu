@@ -30,13 +30,10 @@
 
                 {% if material.attachment %}
                     <article class="material-detail-file">
-                        <h3>Прикрепленный файл</h3>
-                        <p><a href="{{ material.attachment.url }}" target="_blank" rel="noopener noreferrer">Скачать файл</a></p>
-                        {% if material.is_pdf_attachment %}
-                            <div class="material-detail-pdf-wrap">
-                                <iframe src="{{ material.attachment.url }}" title="Просмотр PDF" class="material-detail-pdf"></iframe>
-                            </div>
-                        {% endif %}
+                        <h3>Прикреплённый файл</h3>
+                        <p class="material-detail-file-download">
+                            <a href="{{ material.attachment.url }}" download="{{ material.attachment_display_name }}" rel="noopener noreferrer">{{ material.attachment_display_name }}</a>
+                        </p>
                     </article>
                 {% endif %}
             </div>
