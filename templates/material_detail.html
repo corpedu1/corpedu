@@ -32,7 +32,9 @@
                     <article class="material-detail-file">
                         <h3>Прикреплённый файл</h3>
                         <p class="material-detail-file-download">
-                            <a href="{{ material.attachment.url }}" download="{{ material.attachment_display_name }}" rel="noopener noreferrer">{{ material.attachment_display_name }}</a>
+                            <a href="{{ material.attachment.url }}"{% if material.attachment_display_name %} download="{{ material.attachment_display_name }}"{% endif %} class="material-detail-file-link" rel="noopener noreferrer">
+                                <span class="material-detail-file-link-text">Скачать файл</span>{% if material.attachment_display_name %}<span class="material-detail-file-link-name"> — {{ material.attachment_display_name }}</span>{% endif %}
+                            </a>
                         </p>
                     </article>
                 {% endif %}

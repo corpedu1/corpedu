@@ -1088,13 +1088,26 @@ a {
     line-height: 1.7;
 }
 
-.material-detail-file a {
-    color: #0284c7;
-    text-decoration: none;
+.material-detail-file p {
+    color: #334155;
+    line-height: 1.7;
 }
 
-.material-detail-file a:hover {
+.material-detail-file a,
+.material-detail-file-link {
+    color: #0284c7;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.material-detail-file a:hover,
+.material-detail-file-link:hover {
     text-decoration: underline;
+}
+
+.material-detail-file-link-name {
+    font-weight: 500;
+    color: #0f172a;
 }
 
 .material-detail-file-download {
@@ -1936,10 +1949,6 @@ a {
 
     .materials-grid {
         grid-template-columns: 1fr;
-    }
-
-    .material-detail-pdf {
-        height: 420px;
     }
 
     .curator-material-list__item {

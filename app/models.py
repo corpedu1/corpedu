@@ -138,10 +138,11 @@ class LearningMaterial(models.Model):
         """
         return self.title
 
+    @property
     def attachment_display_name(self):
         """
         Имя прикреплённого файла для отображения и скачивания.
         """
-        if not self.attachment:
+        if not self.attachment or not getattr(self.attachment, "name", ""):
             return ""
-        return os.path.basename(self.attachment.name)
+        return os.path.basename(self.attachment.name) or ""
