@@ -40,7 +40,7 @@
                                 </div>
                             {% endif %}
 
-                            <form method="post" action="/curator-panel/materials/create/" class="admin-role-form" enctype="multipart/form-data">
+                            <form id="curator-material-form" method="post" action="/curator-panel/materials/create/" class="admin-role-form" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="admin-role-form__group">
                                     <label for="material_title">Заголовок</label>
@@ -89,73 +89,24 @@
                                 </label>
 
                                 <h2 class="material-pages-editor__heading">Страницы материала</h2>
-                                <p class="section-subtitle material-pages-editor__hint">Добавьте одну или несколько страниц. Текст без ограничения по объёму. На каждой странице можно загрузить изображение и опционально мини-тест (вопрос и 4 варианта).</p>
+                                <p class="section-subtitle material-pages-editor__hint">Добавьте страницы по необходимости (кнопка «Добавить страницу»). Текст без ограничения по объёму. На каждой странице можно загрузить изображение и опционально мини-тест (вопрос и 4 варианта).</p>
 
                                 {{ page_formset.management_form }}
                                 {% if page_formset.non_form_errors %}
                                     <div class="register-form-errors">{% for err in page_formset.non_form_errors %}<p>{{ err }}</p>{% endfor %}</div>
                                 {% endif %}
 
-                                {% for pform in page_formset %}
-                                    <div class="material-page-editor">
-                                        {% for hidden in pform.hidden_fields %}{{ hidden }}{% endfor %}
-                                        <h3 class="material-page-editor__title">Страница {{ forloop.counter }}</h3>
-                                        {% if page_formset.can_delete and pform.instance.pk %}
-                                            <label class="curator-checkbox material-page-editor__delete">
-                                                {{ pform.DELETE }} <span>Удалить страницу</span>
-                                            </label>
-                                        {% endif %}
-                                        <div class="admin-role-form__group">
-                                            <label for="{{ pform.title.id_for_label }}">Заголовок страницы (необязательно)</label>
-                                            {{ pform.title }}
-                                            {% if pform.title.errors %}<span class="field-error">{{ pform.title.errors.0 }}</span>{% endif %}
-                                        </div>
-                                        <div class="admin-role-form__group">
-                                            <label for="{{ pform.body.id_for_label }}">Текст страницы</label>
-                                            {{ pform.body }}
-                                            {% if pform.body.errors %}<span class="field-error">{{ pform.body.errors.0 }}</span>{% endif %}
-                                        </div>
-                                        <div class="admin-role-form__group">
-                                            <label for="{{ pform.image.id_for_label }}">Изображение (JPG, PNG, GIF, WEBP)</label>
-                                            {{ pform.image }}
-                                            {% if pform.instance.image %}
-                                                <p class="material-page-editor__preview"><img src="{{ pform.instance.image.url }}" alt="" class="material-page-editor__thumb"></p>
-                                            {% endif %}
-                                            {% if pform.image.errors %}<span class="field-error">{{ pform.image.errors.0 }}</span>{% endif %}
-                                        </div>
-                                        <p class="material-page-editor__quiz-title">Мини-тест (необязательно)</p>
-                                        <div class="admin-role-form__group">
-                                            <label for="{{ pform.quiz_question.id_for_label }}">Вопрос</label>
-                                            {{ pform.quiz_question }}
-                                        </div>
-                                        <div class="admin-role-form__grid2">
-                                            <div class="admin-role-form__group">
-                                                <label for="{{ pform.quiz_choice_1.id_for_label }}">Вариант 1</label>
-                                                {{ pform.quiz_choice_1 }}
-                                            </div>
-                                            <div class="admin-role-form__group">
-                                                <label for="{{ pform.quiz_choice_2.id_for_label }}">Вариант 2</label>
-                                                {{ pform.quiz_choice_2 }}
-                                            </div>
-                                            <div class="admin-role-form__group">
-                                                <label for="{{ pform.quiz_choice_3.id_for_label }}">Вариант 3</label>
-                                                {{ pform.quiz_choice_3 }}
-                                            </div>
-                                            <div class="admin-role-form__group">
-                                                <label for="{{ pform.quiz_choice_4.id_for_label }}">Вариант 4</label>
-                                                {{ pform.quiz_choice_4 }}
-                                            </div>
-                                        </div>
-                                        <div class="admin-role-form__group">
-                                            <label for="{{ pform.quiz_correct.id_for_label }}">Верный ответ (номер)</label>
-                                            {{ pform.quiz_correct }}
-                                            {% if pform.quiz_correct.errors %}<span class="field-error">{{ pform.quiz_correct.errors.0 }}</span>{% endif %}
-                                        </div>
-                                        {% if pform.non_field_errors %}
-                                            <div class="register-form-errors">{% for err in pform.non_field_errors %}<p>{{ err }}</p>{% endfor %}</div>
-                                        {% endif %}
-                                    </div>
-                                {% endfor %}
+                                <div id="material-pages-container">
+                                    {% for pform in page_formset %}
+                                        {% include "partials/material_page_form_block.html" with pform=pform page_formset=page_formset page_num=forloop.counter %}
+                                    {% endfor %}
+                                </div>
+                                <template id="material-page-empty-template">
+                                    {% include "partials/material_page_form_block.html" with pform=page_formset.empty_form page_formset=page_formset page_num="__PAGE_NUM__" %}
+                                </template>
+                                <p class="material-pages-editor__add-wrap">
+                                    <button type="button" class="material-page-nav__btn" id="material-add-page-btn">Добавить страницу</button>
+                                </p>
 
                                 <button class="register-submit" type="submit">Сохранить материал</button>
                             </form>
@@ -165,6 +116,25 @@
             </div>
         </section>
     </main>
+
+    <script>
+    (function () {
+        var form = document.getElementById("curator-material-form");
+        var btn = document.getElementById("material-add-page-btn");
+        var container = document.getElementById("material-pages-container");
+        var tmpl = document.getElementById("material-page-empty-template");
+        if (!form || !btn || !container || !tmpl) return;
+        btn.addEventListener("click", function () {
+            var totalInput = form.querySelector('input[name$="-TOTAL_FORMS"]');
+            if (!totalInput) return;
+            var idx = parseInt(totalInput.value, 10);
+            if (isNaN(idx) || idx >= 500) return;
+            var html = tmpl.innerHTML.replace(/__prefix__/g, String(idx)).replace(/__PAGE_NUM__/g, String(idx + 1));
+            container.insertAdjacentHTML("beforeend", html);
+            totalInput.value = String(idx + 1);
+        });
+    })();
+    </script>
 
     <footer class="footer">
         <div class="container footer__content">
