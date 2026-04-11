@@ -3,6 +3,7 @@
 """
 
 import json
+import secrets
 from io import BytesIO
 
 from django.contrib import messages
@@ -48,6 +49,29 @@ from .models import (
     UserMaterialProgress,
     UserRole,
 )
+
+
+def _math_captcha_refresh(request, namespace: str) -> str:
+    """
+    Генерирует пример a + b, сохраняет сумму в сессии. namespace: login или register.
+    """
+    a = secrets.randbelow(19) + 2
+    b = secrets.randbelow(19) + 2
+    request.session[f"{namespace}_math_captcha"] = a + b
+    return f"{a} + {b}"
+
+
+def _math_captcha_verify(request, namespace: str, posted_value) -> bool:
+    """
+    Проверяет ответ и удаляет значение из сессии (одноразово).
+    """
+    expected = request.session.pop(f"{namespace}_math_captcha", None)
+    if expected is None:
+        return False
+    try:
+        return int(str(posted_value).strip()) == int(expected)
+    except (ValueError, TypeError):
+        return False
 
 
 def _compute_material_progress_percent(user, material):
@@ -588,14 +612,36 @@ def register(request):
     if request.user.is_authenticated:
         return redirect("landing")
     if request.method == "POST":
+        if not _math_captcha_verify(request, "register", request.POST.get("captcha_answer")):
+            form = RegisterForm(request.POST)
+            form.add_error(
+                None,
+                "Неверный ответ на проверочный вопрос. Попробуйте решить новый пример.",
+            )
+            captcha_question = _math_captcha_refresh(request, "register")
+            return render(
+                request,
+                "register.html",
+                {"form": form, "captcha_question": captcha_question},
+            )
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
             return redirect("landing")
-    else:
-        form = RegisterForm()
-    return render(request, "register.html", {"form": form})
+        captcha_question = _math_captcha_refresh(request, "register")
+        return render(
+            request,
+            "register.html",
+            {"form": form, "captcha_question": captcha_question},
+        )
+    form = RegisterForm()
+    captcha_question = _math_captcha_refresh(request, "register")
+    return render(
+        request,
+        "register.html",
+        {"form": form, "captcha_question": captcha_question},
+    )
 
 
 def login(request):
@@ -607,14 +653,36 @@ def login(request):
         return redirect(safe) if safe else redirect("landing")
     next_url = request.GET.get("next", "")
     if request.method == "POST":
+        if not _math_captcha_verify(request, "login", request.POST.get("captcha_answer")):
+            form = LoginForm(request.POST)
+            form.add_error(
+                None,
+                "Неверный ответ на проверочный вопрос. Попробуйте решить новый пример.",
+            )
+            captcha_question = _math_captcha_refresh(request, "login")
+            return render(
+                request,
+                "login.html",
+                {"form": form, "next_url": next_url, "captcha_question": captcha_question},
+            )
         form = LoginForm(request.POST)
         if form.is_valid():
             auth_login(request, form.cleaned_data["user"])
             safe = _safe_redirect_path(request.POST.get("next"))
             return redirect(safe) if safe else redirect("landing")
-    else:
-        form = LoginForm()
-    return render(request, "login.html", {"form": form, "next_url": next_url})
+        captcha_question = _math_captcha_refresh(request, "login")
+        return render(
+            request,
+            "login.html",
+            {"form": form, "next_url": next_url, "captcha_question": captcha_question},
+        )
+    form = LoginForm()
+    captcha_question = _math_captcha_refresh(request, "login")
+    return render(
+        request,
+        "login.html",
+        {"form": form, "next_url": next_url, "captcha_question": captcha_question},
+    )
 
 
 def logout(request):

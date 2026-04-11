@@ -47,6 +47,10 @@
                             <label for="register_password_repeat">Подтвердить пароль</label>
                             {% include "partials/password_input.html" with pw_id="register_password_repeat" pw_name="password_repeat" pw_placeholder="Повторите пароль" pw_autocomplete="new-password" %}
                         </div>
+                        <div class="register-input-group register-captcha">
+                            <label for="register_captcha">Проверка: сколько будет {{ captcha_question }}?</label>
+                            <input type="text" name="captcha_answer" id="register_captcha" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Ответ" required>
+                        </div>
                         <button class="register-submit" type="submit">Зарегистрироваться</button>
                     </form>
                     <p class="register-signin">Уже есть аккаунт?

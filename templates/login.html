@@ -35,6 +35,10 @@
                             <label for="login_password">Пароль</label>
                             {% include "partials/password_input.html" with pw_id="login_password" pw_name="password" pw_placeholder="Введите пароль" pw_autocomplete="current-password" %}
                         </div>
+                        <div class="register-input-group register-captcha">
+                            <label for="login_captcha">Проверка: сколько будет {{ captcha_question }}?</label>
+                            <input type="text" name="captcha_answer" id="login_captcha" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Ответ" required>
+                        </div>
                         <button class="register-submit" type="submit">Войти</button>
                     </form>
                     <p class="register-signin">Нет аккаунта?
