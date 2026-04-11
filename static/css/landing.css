@@ -321,7 +321,7 @@ a {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
     gap: 28px;
-    align-items: stretch;
+    align-items: center;
 }
 
 .eyebrow {
@@ -358,30 +358,13 @@ a {
     gap: 8px;
 }
 
-.hero__placeholder {
-    display: flex;
-    align-items: stretch;
-}
-
-.hero__placeholder-inner {
+.hero__image {
+    display: block;
     width: 100%;
-    min-height: 320px;
-    border-radius: 18px;
-    border: 2px dashed rgba(125, 211, 252, 0.6);
-    background: linear-gradient(165deg, rgba(15, 23, 42, 0.68), rgba(30, 41, 59, 0.86));
-    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.28);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.hero__placeholder-inner p {
-    margin: 0;
-    color: #cbd5e1;
-    font-size: 1rem;
-    text-align: center;
-    letter-spacing: 0.2px;
+    max-width: min(420px, 100%);
+    height: auto;
+    object-fit: contain;
+    justify-self: end;
 }
 
 .panel__list {
@@ -3536,6 +3519,10 @@ a.admin-material-stats-export {
     .security-grid,
     .steps {
         grid-template-columns: 1fr;
+    }
+
+    .hero__image {
+        justify-self: center;
     }
 
     .panel__list {
