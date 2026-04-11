@@ -1,0 +1,8 @@
+<aside class="admin-sidebar">
+    <a class="admin-sidebar__brand" href="{% url 'cabinet' %}">Личный кабинет</a>
+    <nav class="admin-sidebar__nav">
+        <a href="{% url 'cabinet' %}" {% if cabinet_nav_active == 'overview' %}class="admin-sidebar__nav-link--active" aria-current="page"{% endif %}>Обзор</a>
+        <a href="{% url 'cabinet_materials' %}" {% if cabinet_nav_active == 'materials' %}class="admin-sidebar__nav-link--active" aria-current="page"{% endif %}>Материалы</a>
+        <a href="{% url 'cabinet_tests' %}" {% if cabinet_nav_active == 'tests' %}class="admin-sidebar__nav-link--active" aria-current="page"{% endif %}>Тесты</a>
+    </nav>
+</aside>

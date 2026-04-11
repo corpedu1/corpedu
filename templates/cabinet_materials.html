@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прогресс по материалам | Личный кабинет | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section admin-panel-page">
+            <div class="container">
+                <div class="admin-layout">
+                    {% include "partials/cabinet_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Личный кабинет</p>
+                        <h1>Прогресс по материалам</h1>
+                        <p class="section-subtitle">
+                            Учебные материалы, по которым зафиксирован ваш прогресс.
+                        </p>
+
+                        <article class="settings-card cabinet-panel-card">
+                            <h2>Список материалов</h2>
+                            <table class="cabinet-progress-table">
+                                <thead>
+                                    <tr>
+                                        <th>Материал</th>
+                                        <th>Прогресс</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in material_progress_rows %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'material_detail' row.material.slug %}">{{ row.material.title }}</a>
+                                            </td>
+                                            <td>
+                                                <div class="cabinet-progress-bar">
+                                                    <div class="cabinet-progress-bar__track" role="img" aria-label="{{ row.percent }} процентов">
+                                                        <span class="cabinet-progress-bar__fill" style="width: {{ row.percent }}%;"></span>
+                                                    </div>
+                                                    <span class="cabinet-progress-bar__pct">{{ row.percent }}%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="2">Пока нет материалов с прогрессом — откройте любой материал из <a href="{% url 'materials' %}">каталога</a>.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/">Вернуться на главную</a>
+        </div>
+    </footer>
+</body>
+</html>

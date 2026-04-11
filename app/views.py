@@ -572,6 +572,25 @@ def settings(request):
     )
 
 
+def _material_progress_rows_for_user(user):
+    """
+    Материалы с записью UserMaterialProgress (опубликованные), с вычисленным процентом.
+    """
+    progress_records = (
+        UserMaterialProgress.objects.filter(user=user, material__is_published=True)
+        .select_related("material", "material__category")
+        .prefetch_related("material__pages")
+        .order_by("-updated_at")
+    )
+    return [
+        {
+            "material": rec.material,
+            "percent": _compute_material_progress_percent(user, rec.material),
+        }
+        for rec in progress_records
+    ]
+
+
 def _knowledge_test_progress_rows_for_user(user):
     """
     Тесты, по которым у пользователя была хотя бы одна попытка (опубликованные).
@@ -610,28 +629,47 @@ def _knowledge_test_progress_rows_for_user(user):
 @login_required
 def cabinet(request):
     """
-    Личный кабинет: прогресс по материалам (UserMaterialProgress) и по тестам (попытки).
+    Личный кабинет: обзор — краткая сводка по прогрессу материалов и тестов.
     """
-    progress_records = (
-        UserMaterialProgress.objects.filter(user=request.user, material__is_published=True)
-        .select_related("material", "material__category")
-        .prefetch_related("material__pages")
-        .order_by("-updated_at")
-    )
-    material_progress_rows = [
-        {
-            "material": rec.material,
-            "percent": _compute_material_progress_percent(request.user, rec.material),
-        }
-        for rec in progress_records
-    ]
+    material_progress_rows = _material_progress_rows_for_user(request.user)
     test_progress_rows = _knowledge_test_progress_rows_for_user(request.user)
     return render(
         request,
         "cabinet.html",
         {
-            "material_progress_rows": material_progress_rows,
-            "test_progress_rows": test_progress_rows,
+            "materials_progress_count": len(material_progress_rows),
+            "tests_progress_count": len(test_progress_rows),
+            "cabinet_nav_active": "overview",
+        },
+    )
+
+
+@login_required
+def cabinet_materials(request):
+    """
+    Личный кабинет: прогресс по учебным материалам.
+    """
+    return render(
+        request,
+        "cabinet_materials.html",
+        {
+            "material_progress_rows": _material_progress_rows_for_user(request.user),
+            "cabinet_nav_active": "materials",
+        },
+    )
+
+
+@login_required
+def cabinet_tests(request):
+    """
+    Личный кабинет: прогресс по платформенным тестам.
+    """
+    return render(
+        request,
+        "cabinet_tests.html",
+        {
+            "test_progress_rows": _knowledge_test_progress_rows_for_user(request.user),
+            "cabinet_nav_active": "tests",
         },
     )
 
@@ -647,8 +685,7 @@ def admin_panel(request):
         "users_count": User.objects.count(),
         "curators_count": User.objects.filter(role=UserRole.CURATOR).count(),
         "materials_count": LearningMaterial.objects.count(),
-        "published_materials_count": LearningMaterial.objects.filter(is_published=True).count(),
-        "categories_count": MaterialCategory.objects.count(),
+        "tests_count": KnowledgeTest.objects.count(),
     }
     return render(request, "admin_panel.html", context)
 

@@ -7,86 +7,39 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/landing.css' %}">
 </head>
-<body class="register-page-layout">
+<body>
     {% include "partials/navbar.html" %}
 
-    <main class="register-main">
-        <section class="section settings-page cabinet-page">
-            <div class="container settings-page__container settings-page__container--cabinet">
-                <header class="cabinet-page__intro">
-                    <p class="section-kicker">Личный кабинет</p>
-                    <h1>Добро пожаловать, {{ request.user.first_name|default:request.user.username }}</h1>
-                </header>
+    <main>
+        <section class="section admin-panel-page">
+            <div class="container">
+                <div class="admin-layout">
+                    {% include "partials/cabinet_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Личный кабинет</p>
+                        <h1>Добро пожаловать, {{ request.user.first_name|default:request.user.username }}</h1>
+                        <p class="section-subtitle">
+                            Сводка по вашему обучению: материалы и платформенные тесты.
+                        </p>
 
-                <article class="settings-card">
-                    <h2>Прогресс по материалам</h2>
-                    <table class="cabinet-progress-table">
-                        <thead>
-                            <tr>
-                                <th>Материал</th>
-                                <th>Прогресс</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in material_progress_rows %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'material_detail' row.material.slug %}">{{ row.material.title }}</a>
-                                    </td>
-                                    <td>
-                                        <div class="cabinet-progress-bar">
-                                            <div class="cabinet-progress-bar__track" role="img" aria-label="{{ row.percent }} процентов">
-                                                <span class="cabinet-progress-bar__fill" style="width: {{ row.percent }}%;"></span>
-                                            </div>
-                                            <span class="cabinet-progress-bar__pct">{{ row.percent }}%</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="2">Пока нет материалов с прогрессом — откройте любой материал из каталога.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </article>
+                        <div class="admin-panel-grid">
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Материалов с прогрессом</p>
+                                <p class="admin-panel-card__value">{{ materials_progress_count }}</p>
+                                <a class="admin-panel-card__link" href="{% url 'cabinet_materials' %}">Подробнее по материалам</a>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Тестов с результатами</p>
+                                <p class="admin-panel-card__value">{{ tests_progress_count }}</p>
+                                <a class="admin-panel-card__link" href="{% url 'cabinet_tests' %}">Подробнее по тестам</a>
+                            </article>
+                        </div>
 
-                <article class="settings-card">
-                    <h2>Прогресс по тестам</h2>
-                    <table class="cabinet-progress-table">
-                        <thead>
-                            <tr>
-                                <th>Тест</th>
-                                <th>Лучший результат</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in test_progress_rows %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'knowledge_test_detail' row.test.slug %}">{{ row.test.title }}</a>
-                                    </td>
-                                    <td>
-                                        <div class="cabinet-progress-bar">
-                                            <div class="cabinet-progress-bar__track" role="img" aria-label="{{ row.percent }} процентов">
-                                                <span class="cabinet-progress-bar__fill" style="width: {{ row.percent }}%;"></span>
-                                            </div>
-                                            <span class="cabinet-progress-bar__pct">{{ row.percent }}%</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="2">Пока нет тестов с прогрессом — начните тест в разделе <a href="{% url 'knowledge_tests' %}">Тесты</a>.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </article>
-
-                <p class="cabinet-page__footer-note">
-                    <a href="{% url 'settings' %}">Перейти в настройки профиля</a>
-                </p>
+                        <p class="cabinet-page__footer-note cabinet-page__footer-note--in-panel">
+                            <a href="{% url 'settings' %}">Перейти в настройки профиля</a>
+                        </p>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
