@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Безопасность | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="security-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section security-intro">
+            <div class="container">
+                <p class="section-kicker">Платформа</p>
+                <h1>Безопасность</h1>
+                <p class="section-subtitle">
+                    Мы закладываем в сервис базовые принципы защиты данных и управления доступом: обучение по ИБ
+                    не должно сопровождаться лишними рисками для организации и персонала.
+                </p>
+            </div>
+        </section>
+
+        <section class="section section--accent">
+            <div class="container">
+                <p class="section-kicker">Принципы</p>
+                <h2>Как устроена защита</h2>
+                <p class="section-subtitle">Опорные механизмы внутри платформы CyberLearn Витте.</p>
+                <div class="security-grid">
+                    <div class="security-item">
+                        <h3>Разграничение доступа</h3>
+                        <p>Функции и данные доступны только в рамках назначенной роли: администратор, куратор или сотрудник.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Защита сессий</h3>
+                        <p>Используются механизмы, снижающие риск несанкционированного доступа к учётным записям при работе в сервисе.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Безопасная работа с данными</h3>
+                        <p>Обработка пользовательских данных ведётся с учётом базовых требований к конфиденциальности и целостности информации.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">Практика</p>
+                <h2>Что это значит для организации</h2>
+                <p class="section-subtitle">
+                    Платформа предназначена для корпоративного использования: учётные записи выдаются в рамках организации,
+                    а сценарии обучения и проверки знаний согласуются с внутренними регламентами.
+                </p>
+                <ul class="security-page__list">
+                    <li>Доступ к учебным материалам и тестам — у авторизованных пользователей после входа в систему.</li>
+                    <li>Роли определяют, кто управляет пользователями и контентом, а кто проходит обучение.</li>
+                    <li>Результаты обучения и тестирования хранятся в системе для отчётности и контроля программ.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section security-cta">
+            <div class="container">
+                <p class="section-kicker">Вопросы</p>
+                <h2>Нужны детали</h2>
+                <p class="section-subtitle">
+                    Напишите через <a href="/feedback/">обратную связь</a> или загляните в <a href="/faq/">FAQ</a>.
+                    Общая информация о платформе — в разделе <a href="/about/">О нас</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin/">Перейти к авторизации</a>
+        </div>
+    </footer>
+</body>
+</html>

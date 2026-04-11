@@ -453,6 +453,35 @@ a {
     padding-top: 36px;
 }
 
+.security-page .security-intro {
+    padding-bottom: 28px;
+}
+
+.security-page .security-intro + .section {
+    padding-top: 36px;
+}
+
+.security-page .security-page__list {
+    margin: 0;
+    padding-left: 22px;
+    max-width: 760px;
+    color: #475569;
+    font-size: 1rem;
+    line-height: 1.65;
+    display: grid;
+    gap: 12px;
+}
+
+.security-page .security-cta .section-subtitle a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.security-page .security-cta .section-subtitle a:hover {
+    text-decoration: underline;
+}
+
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));

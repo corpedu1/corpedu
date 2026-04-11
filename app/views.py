@@ -283,6 +283,13 @@ def advantages(request):
     return render(request, "advantages.html")
 
 
+def security(request):
+    """
+    Отображает страницу «Безопасность» (принципы защиты платформы).
+    """
+    return render(request, "security.html")
+
+
 def contacts(request):
     """
     Отображает страницу «Контакты».
