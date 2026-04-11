@@ -29,6 +29,8 @@ urlpatterns = [
     path('materials/', views.materials, name='materials'),
     path('materials/<slug:slug>/quiz-complete/', views.material_quiz_complete, name='material_quiz_complete'),
     path('materials/<slug:slug>/', views.material_detail, name='material_detail'),
+    path('tests/', views.knowledge_tests, name='knowledge_tests'),
+    path('tests/<slug:slug>/', views.knowledge_test_detail, name='knowledge_test_detail'),
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
@@ -41,6 +43,9 @@ urlpatterns = [
     path('curator-panel/materials/', views.curator_materials_manage, name='curator_materials_manage'),
     path('curator-panel/materials/create/', views.curator_material_create, name='curator_material_create'),
     path('curator-panel/materials/<slug:slug>/', views.curator_material_edit, name='curator_material_edit'),
+    path('curator-panel/tests/', views.curator_knowledge_tests_manage, name='curator_knowledge_tests_manage'),
+    path('curator-panel/tests/create/', views.curator_knowledge_test_create, name='curator_knowledge_test_create'),
+    path('curator-panel/tests/<slug:slug>/edit/', views.curator_knowledge_test_edit, name='curator_knowledge_test_edit'),
     path('admin/', admin.site.urls),
 ]
 

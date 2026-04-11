@@ -6,7 +6,7 @@ from django import forms
 from django.contrib.auth import authenticate, get_user_model
 from django.forms import inlineformset_factory
 
-from .models import LearningMaterial, MaterialPage
+from .models import KnowledgeTest, LearningMaterial, MaterialPage
 
 
 User = get_user_model()
@@ -181,3 +181,55 @@ MaterialPageFormSetCreate = inlineformset_factory(
     validate_min=False,
     max_num=500,
 )
+
+
+class CuratorKnowledgeTestForm(forms.ModelForm):
+    """
+    Создание и редактирование платформенного теста куратором.
+    """
+
+    class Meta:
+        model = KnowledgeTest
+        fields = (
+            "title",
+            "summary",
+            "category",
+            "estimated_minutes",
+            "passing_score_percent",
+            "is_published",
+        )
+        widgets = {
+            "summary": forms.Textarea(attrs={"rows": 4}),
+        }
+
+    def clean_passing_score_percent(self):
+        value = self.cleaned_data.get("passing_score_percent")
+        if value is not None and value > 100:
+            raise forms.ValidationError("Проходной балл не может быть больше 100%.")
+        return value
+
+
+class KnowledgeTestQuestionEntryForm(forms.Form):
+    """
+    Добавление вопроса с четырьмя вариантами и одним верным ответом.
+    """
+
+    text = forms.CharField(label="Текст вопроса", widget=forms.Textarea(attrs={"rows": 3}))
+    choice_1 = forms.CharField(label="Вариант 1")
+    choice_2 = forms.CharField(label="Вариант 2")
+    choice_3 = forms.CharField(label="Вариант 3")
+    choice_4 = forms.CharField(label="Вариант 4")
+    correct_choice = forms.TypedChoiceField(
+        label="Верный ответ",
+        choices=[(1, "Вариант 1"), (2, "Вариант 2"), (3, "Вариант 3"), (4, "Вариант 4")],
+        coerce=int,
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        for key in ("choice_1", "choice_2", "choice_3", "choice_4"):
+            val = (cleaned.get(key) or "").strip()
+            cleaned[key] = val
+            if not val:
+                self.add_error(key, "Заполните все варианты ответа.")
+        return cleaned

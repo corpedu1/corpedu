@@ -19,7 +19,7 @@
                         <p class="section-kicker">Куратор</p>
                         <h1>Панель управления</h1>
                         <p class="section-subtitle">
-                            Сводная информация по вашим учебным материалам.
+                            Сводная информация по вашим учебным материалам и тестам.
                         </p>
 
                         <div class="admin-panel-grid">
@@ -32,8 +32,20 @@
                                 <p class="admin-panel-card__value">{{ published_materials_count }}</p>
                             </article>
                             <article class="admin-panel-card">
-                                <p class="admin-panel-card__label">Черновики</p>
+                                <p class="admin-panel-card__label">Черновики материалов</p>
                                 <p class="admin-panel-card__value">{{ draft_materials_count }}</p>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Всего тестов</p>
+                                <p class="admin-panel-card__value">{{ tests_count }}</p>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Тесты опубликованы</p>
+                                <p class="admin-panel-card__value">{{ published_tests_count }}</p>
+                            </article>
+                            <article class="admin-panel-card">
+                                <p class="admin-panel-card__label">Черновики тестов</p>
+                                <p class="admin-panel-card__value">{{ draft_tests_count }}</p>
                             </article>
                         </div>
                     </div>

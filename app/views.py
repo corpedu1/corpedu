@@ -10,6 +10,8 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.db.models import Count, Max
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -18,7 +20,9 @@ from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
 from .forms import (
+    CuratorKnowledgeTestForm,
     CuratorMaterialForm,
+    KnowledgeTestQuestionEntryForm,
     LoginForm,
     MaterialPageFormSet,
     MaterialPageFormSetCreate,
@@ -26,6 +30,9 @@ from .forms import (
     RegisterForm,
 )
 from .models import (
+    KnowledgeTest,
+    KnowledgeTestAnswerChoice,
+    KnowledgeTestQuestion,
     LearningMaterial,
     MaterialCategory,
     MaterialPage,
@@ -79,6 +86,22 @@ def _build_unique_material_slug(title, current_id=None):
     slug = base_slug
     index = 1
     queryset = LearningMaterial.objects.all()
+    if current_id is not None:
+        queryset = queryset.exclude(pk=current_id)
+    while queryset.filter(slug=slug).exists():
+        index += 1
+        slug = f"{base_slug}-{index}"
+    return slug
+
+
+def _build_unique_knowledge_test_slug(title, current_id=None):
+    """
+    Формирует уникальный слаг для платформенного теста.
+    """
+    base_slug = slugify(title) or "test"
+    slug = base_slug
+    index = 1
+    queryset = KnowledgeTest.objects.all()
     if current_id is not None:
         queryset = queryset.exclude(pk=current_id)
     while queryset.filter(slug=slug).exists():
@@ -171,6 +194,32 @@ def materials(request):
     """
     items = LearningMaterial.objects.filter(is_published=True).select_related("category", "author")
     return render(request, "materials.html", {"materials": items})
+
+
+def knowledge_tests(request):
+    """
+    Список опубликованных платформенных тестов.
+    """
+    items = (
+        KnowledgeTest.objects.filter(is_published=True)
+        .select_related("category", "author")
+        .annotate(question_count=Count("questions"))
+    )
+    return render(request, "knowledge_tests.html", {"tests": items})
+
+
+def knowledge_test_detail(request, slug):
+    """
+    Карточка теста (публично, только опубликованные).
+    """
+    test = get_object_or_404(
+        KnowledgeTest.objects.filter(is_published=True)
+        .select_related("category", "author")
+        .annotate(question_count=Count("questions"))
+        .prefetch_related("questions__answer_choices"),
+        slug=slug,
+    )
+    return render(request, "knowledge_test_detail.html", {"test": test})
 
 
 def material_detail(request, slug):
@@ -519,6 +568,9 @@ def curator_panel(request):
         "materials_count": LearningMaterial.objects.filter(author=request.user).count(),
         "published_materials_count": LearningMaterial.objects.filter(author=request.user, is_published=True).count(),
         "draft_materials_count": LearningMaterial.objects.filter(author=request.user, is_published=False).count(),
+        "tests_count": KnowledgeTest.objects.filter(author=request.user).count(),
+        "published_tests_count": KnowledgeTest.objects.filter(author=request.user, is_published=True).count(),
+        "draft_tests_count": KnowledgeTest.objects.filter(author=request.user, is_published=False).count(),
     }
     return render(request, "curator_panel.html", context)
 
@@ -639,6 +691,129 @@ def curator_material_edit(request, slug):
             "form": form,
             "page_formset": page_formset,
             "material": material,
+            "error_message": error_message,
+            "success_message": success_message,
+        },
+    )
+
+
+@login_required
+def curator_knowledge_tests_manage(request):
+    """
+    Список платформенных тестов куратора.
+    """
+    if not _is_curator(request.user):
+        return redirect("landing")
+    items = KnowledgeTest.objects.filter(author=request.user).select_related("category").order_by("-created_at")
+    return render(request, "curator_knowledge_tests_manage.html", {"tests": items})
+
+
+@login_required
+def curator_knowledge_test_create(request):
+    """
+    Создание платформенного теста: после сохранения — переход к редактированию вопросов.
+    """
+    if not _is_curator(request.user):
+        return redirect("landing")
+    error_message = ""
+    if request.method == "POST":
+        form = CuratorKnowledgeTestForm(request.POST)
+        if form.is_valid():
+            test = form.save(commit=False)
+            test.author = request.user
+            test.slug = _build_unique_knowledge_test_slug(test.title)
+            if test.is_published:
+                test.published_at = timezone.now()
+            else:
+                test.published_at = None
+            test.save()
+            return redirect("curator_knowledge_test_edit", slug=test.slug)
+        error_message = "Проверьте корректность заполнения полей."
+    else:
+        form = CuratorKnowledgeTestForm()
+    return render(
+        request,
+        "curator_knowledge_test_create.html",
+        {"form": form, "error_message": error_message},
+    )
+
+
+@login_required
+def curator_knowledge_test_edit(request, slug):
+    """
+    Редактирование теста и добавление вопросов с вариантами ответов.
+    """
+    if not _is_curator(request.user):
+        return redirect("landing")
+    test = get_object_or_404(KnowledgeTest, slug=slug, author=request.user)
+    success_message = ""
+    error_message = ""
+    test_form = CuratorKnowledgeTestForm(instance=test)
+    question_form = KnowledgeTestQuestionEntryForm()
+
+    if request.method == "POST":
+        action = request.POST.get("action", "").strip()
+        if action == "delete_question":
+            qid = request.POST.get("question_id")
+            try:
+                qid = int(qid)
+            except (TypeError, ValueError):
+                qid = None
+            if qid:
+                KnowledgeTestQuestion.objects.filter(pk=qid, test_id=test.id).delete()
+                success_message = "Вопрос удалён."
+        elif action == "add_question":
+            question_form = KnowledgeTestQuestionEntryForm(request.POST)
+            if question_form.is_valid():
+                with transaction.atomic():
+                    max_order = KnowledgeTestQuestion.objects.filter(test_id=test.id).aggregate(m=Max("order"))["m"] or 0
+                    q = KnowledgeTestQuestion.objects.create(
+                        test_id=test.id,
+                        order=max_order + 1,
+                        text=question_form.cleaned_data["text"].strip(),
+                    )
+                    cc = question_form.cleaned_data["correct_choice"]
+                    for i in range(1, 5):
+                        KnowledgeTestAnswerChoice.objects.create(
+                            question=q,
+                            order=i,
+                            text=question_form.cleaned_data[f"choice_{i}"],
+                            is_correct=(i == cc),
+                        )
+                success_message = "Вопрос добавлен."
+                question_form = KnowledgeTestQuestionEntryForm()
+            else:
+                error_message = "Проверьте поля нового вопроса."
+        else:
+            test_form = CuratorKnowledgeTestForm(request.POST, instance=test)
+            if test_form.is_valid():
+                updated = test_form.save(commit=False)
+                updated.author = request.user
+                updated.slug = _build_unique_knowledge_test_slug(updated.title, current_id=updated.id)
+                if updated.is_published and updated.published_at is None:
+                    updated.published_at = timezone.now()
+                if not updated.is_published:
+                    updated.published_at = None
+                updated.save()
+                test = updated
+                success_message = "Данные теста сохранены."
+                test_form = CuratorKnowledgeTestForm(instance=test)
+            else:
+                error_message = "Проверьте основные поля теста."
+
+    questions = (
+        KnowledgeTestQuestion.objects.filter(test_id=test.id)
+        .prefetch_related("answer_choices")
+        .order_by("order", "id")
+    )
+    return render(
+        request,
+        "curator_knowledge_test_edit.html",
+        {
+            "test": test,
+            "test_form": test_form,
+            "question_form": question_form,
+            "questions": questions,
             "error_message": error_message,
             "success_message": success_message,
         },

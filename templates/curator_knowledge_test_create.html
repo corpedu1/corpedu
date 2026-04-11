@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание теста | Панель куратора</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="curator-material-create-body">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section admin-panel-page curator-material-create">
+            <div class="container">
+                <div class="admin-layout">
+                    {% include "partials/curator_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <header class="curator-material-create__intro">
+                            <p class="section-kicker">Куратор</p>
+                            <h1>Создание теста</h1>
+                            <p class="section-subtitle curator-material-create__lead">
+                                Заполните блоки ниже. После сохранения вы перейдёте к добавлению вопросов и вариантов ответов.
+                            </p>
+                        </header>
+
+                        <article class="admin-role-card admin-role-card--material-create">
+                            {% if error_message %}
+                                <div class="register-form-errors admin-message-space"><p>{{ error_message }}</p></div>
+                            {% endif %}
+                            {% if form.non_field_errors %}
+                                <div class="register-form-errors">
+                                    {% for error in form.non_field_errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <form id="curator-test-form" method="post" action="{% url 'curator_knowledge_test_create' %}" class="admin-role-form curator-material-form">
+                                {% csrf_token %}
+
+                                <section class="curator-material-form__section curator-material-form__section--pages" aria-labelledby="test-form-section-heading">
+                                    <h2 id="test-form-section-heading" class="curator-material-form__section-title">Данные теста</h2>
+                                    <p class="curator-material-form__section-lead">Блоки можно сворачивать и разворачивать, как при добавлении страниц к материалу.</p>
+
+                                    <div class="curator-test-form-accordions">
+                                        <div class="material-page-accordion" data-test-acc="main" data-material-page>
+                                            <div class="material-page-accordion__header">
+                                                <button type="button" class="material-page-accordion__toggle" aria-expanded="true">
+                                                    <span class="material-page-accordion__title-wrap">
+                                                        <span class="material-page-accordion__label">Основное</span>
+                                                        {% with t=form.title.value|default:'' %}
+                                                        <span class="material-page-accordion__title-detail{% if not t %} material-page-accordion__title-detail--empty{% endif %}" data-page-title-detail>
+                                                            <span class="material-page-accordion__title-sep"> — </span>«<span data-page-title-text>{{ t|truncatechars:72 }}</span>»
+                                                        </span>
+                                                        {% endwith %}
+                                                    </span>
+                                                    <span class="material-page-accordion__chevron" aria-hidden="true"></span>
+                                                </button>
+                                            </div>
+                                            <div class="material-page-accordion__body">
+                                                <div class="material-page-accordion__fields">
+                                                    <div class="admin-role-form__group">
+                                                        <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                                                        {{ form.title }}
+                                                        {% if form.title.errors %}<span class="register-field-error">{{ form.title.errors.0 }}</span>{% endif %}
+                                                    </div>
+                                                    <div class="admin-role-form__group">
+                                                        <label for="{{ form.summary.id_for_label }}">{{ form.summary.label }}</label>
+                                                        {{ form.summary }}
+                                                        {% if form.summary.errors %}<span class="register-field-error">{{ form.summary.errors.0 }}</span>{% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="material-page-accordion material-page-accordion--collapsed" data-test-acc="meta">
+                                            <div class="material-page-accordion__header">
+                                                <button type="button" class="material-page-accordion__toggle" aria-expanded="false">
+                                                    <span class="material-page-accordion__title-wrap">
+                                                        <span class="material-page-accordion__label">Категория и время</span>
+                                                        <span class="material-page-accordion__title-detail material-page-accordion__title-detail--empty" data-meta-preview-detail>
+                                                            <span class="material-page-accordion__title-sep"> — </span><span data-meta-preview-text></span>
+                                                        </span>
+                                                    </span>
+                                                    <span class="material-page-accordion__chevron" aria-hidden="true"></span>
+                                                </button>
+                                            </div>
+                                            <div class="material-page-accordion__body">
+                                                <div class="material-page-accordion__fields">
+                                                    <div class="admin-role-form__group">
+                                                        <label for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+                                                        {{ form.category }}
+                                                        {% if form.category.errors %}<span class="register-field-error">{{ form.category.errors.0 }}</span>{% endif %}
+                                                    </div>
+                                                    <div class="admin-role-form__group">
+                                                        <label for="{{ form.estimated_minutes.id_for_label }}">{{ form.estimated_minutes.label }}</label>
+                                                        {{ form.estimated_minutes }}
+                                                        {% if form.estimated_minutes.errors %}<span class="register-field-error">{{ form.estimated_minutes.errors.0 }}</span>{% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="material-page-accordion material-page-accordion--collapsed" data-test-acc="publish">
+                                            <div class="material-page-accordion__header">
+                                                <button type="button" class="material-page-accordion__toggle" aria-expanded="false">
+                                                    <span class="material-page-accordion__title-wrap">
+                                                        <span class="material-page-accordion__label">Прохождение и публикация</span>
+                                                        <span class="material-page-accordion__title-detail" data-publish-preview-detail>
+                                                            <span class="material-page-accordion__title-sep"> — </span><span data-publish-preview-text></span>
+                                                        </span>
+                                                    </span>
+                                                    <span class="material-page-accordion__chevron" aria-hidden="true"></span>
+                                                </button>
+                                            </div>
+                                            <div class="material-page-accordion__body">
+                                                <div class="material-page-accordion__fields">
+                                                    <div class="admin-role-form__group">
+                                                        <label for="{{ form.passing_score_percent.id_for_label }}">{{ form.passing_score_percent.label }}</label>
+                                                        {{ form.passing_score_percent }}
+                                                        {% if form.passing_score_percent.help_text %}
+                                                            <span class="curator-material-form__field-hint">{{ form.passing_score_percent.help_text }}</span>
+                                                        {% endif %}
+                                                        {% if form.passing_score_percent.errors %}<span class="register-field-error">{{ form.passing_score_percent.errors.0 }}</span>{% endif %}
+                                                    </div>
+                                                    <div class="curator-material-form__checkbox-row">
+                                                        <label class="curator-checkbox">
+                                                            {{ form.is_published }}
+                                                            <span>Опубликовать сразу</span>
+                                                        </label>
+                                                        {% if form.is_published.errors %}<span class="register-field-error">{{ form.is_published.errors.0 }}</span>{% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <div class="curator-material-form__submit-wrap">
+                                    <button type="submit" class="register-submit curator-material-form__submit">Создать и перейти к вопросам</button>
+                                </div>
+                            </form>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+    (function () {
+        var form = document.getElementById("curator-test-form");
+        if (!form) return;
+
+        function setCollapsed(acc, collapsed) {
+            var tBtn = acc.querySelector(".material-page-accordion__toggle");
+            if (collapsed) {
+                acc.classList.add("material-page-accordion--collapsed");
+                if (tBtn) tBtn.setAttribute("aria-expanded", "false");
+            } else {
+                acc.classList.remove("material-page-accordion--collapsed");
+                if (tBtn) tBtn.setAttribute("aria-expanded", "true");
+            }
+        }
+
+        function syncMainAccordion() {
+            var acc = form.querySelector('[data-test-acc="main"]');
+            if (!acc) return;
+            var input = form.querySelector("#id_title");
+            var detail = acc.querySelector("[data-page-title-detail]");
+            var textEl = acc.querySelector("[data-page-title-text]");
+            if (!input || !detail || !textEl) return;
+            var v = (input.value || "").trim();
+            textEl.textContent = v.length > 72 ? v.slice(0, 72) + "…" : v;
+            if (v) {
+                detail.classList.remove("material-page-accordion__title-detail--empty");
+            } else {
+                detail.classList.add("material-page-accordion__title-detail--empty");
+            }
+        }
+
+        function syncMetaAccordion() {
+            var acc = form.querySelector('[data-test-acc="meta"]');
+            if (!acc) return;
+            var sel = form.querySelector("#id_category");
+            var minEl = form.querySelector("#id_estimated_minutes");
+            var detail = acc.querySelector("[data-meta-preview-detail]");
+            var textEl = acc.querySelector("[data-meta-preview-text]");
+            if (!detail || !textEl) return;
+            var catText = "";
+            if (sel && sel.selectedIndex >= 0) {
+                var opt = sel.options[sel.selectedIndex];
+                if (opt && opt.value) {
+                    catText = (opt.text || "").trim();
+                }
+            }
+            var mins = minEl && minEl.value ? String(minEl.value).trim() : "";
+            var parts = [];
+            if (catText) parts.push(catText);
+            if (mins) parts.push(mins + " мин");
+            var v = parts.join(" · ");
+            textEl.textContent = v;
+            if (v) {
+                detail.classList.remove("material-page-accordion__title-detail--empty");
+            } else {
+                detail.classList.add("material-page-accordion__title-detail--empty");
+            }
+        }
+
+        function syncPublishAccordion() {
+            var acc = form.querySelector('[data-test-acc="publish"]');
+            if (!acc) return;
+            var p = form.querySelector("#id_passing_score_percent");
+            var pub = form.querySelector("#id_is_published");
+            var textEl = acc.querySelector("[data-publish-preview-text]");
+            if (!textEl) return;
+            var pct = p && p.value !== "" ? p.value : "";
+            var published = pub && pub.checked;
+            var bits = [];
+            if (pct !== "") bits.push(pct + "%");
+            bits.push(published ? "к публикации" : "черновик");
+            textEl.textContent = bits.join(" · ");
+        }
+
+        form.addEventListener("click", function (e) {
+            var toggle = e.target.closest(".material-page-accordion__toggle");
+            if (!toggle || !form.contains(toggle)) return;
+            e.preventDefault();
+            var acc = toggle.closest(".material-page-accordion");
+            if (!acc) return;
+            syncMainAccordion();
+            syncMetaAccordion();
+            syncPublishAccordion();
+            var isCollapsed = acc.classList.contains("material-page-accordion--collapsed");
+            setCollapsed(acc, !isCollapsed);
+        });
+
+        form.addEventListener("input", function (e) {
+            if (e.target && e.target.id === "id_title") syncMainAccordion();
+            if (e.target && (e.target.id === "id_estimated_minutes" || e.target.id === "id_passing_score_percent")) {
+                syncMetaAccordion();
+                syncPublishAccordion();
+            }
+        });
+        form.addEventListener("change", function (e) {
+            if (e.target && e.target.id === "id_category") syncMetaAccordion();
+            if (e.target && e.target.id === "id_is_published") syncPublishAccordion();
+        });
+
+        syncMainAccordion();
+        syncMetaAccordion();
+        syncPublishAccordion();
+    })();
+    </script>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="{% url 'curator_knowledge_tests_manage' %}">К списку тестов</a>
+        </div>
+    </footer>
+</body>
+</html>

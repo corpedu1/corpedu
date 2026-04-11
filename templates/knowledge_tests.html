@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тесты | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="materials-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">Проверка знаний</p>
+                <h1>Тесты</h1>
+                <p class="section-subtitle">
+                    Платформенные тесты по информационной безопасности. Отдельно от мини-тестов внутри учебных материалов.
+                </p>
+
+                {% if tests %}
+                    <div class="materials-grid">
+                        {% for item in tests %}
+                            <article class="material-card">
+                                <div class="material-card__meta">
+                                    <span>{{ item.category.name }}</span>
+                                    <span>{{ item.question_count }} вопр.</span>
+                                </div>
+                                <h3><a class="material-card__title-link" href="{% url 'knowledge_test_detail' item.slug %}">{{ item.title }}</a></h3>
+                                <p>{{ item.summary|default:"Описание будет добавлено позднее." }}</p>
+                                <div class="material-card__footer">
+                                    <span>Автор: {{ item.author.username }}</span>
+                                    <span>~{{ item.estimated_minutes }} мин</span>
+                                </div>
+                                <a class="material-card__details-button" href="{% url 'knowledge_test_detail' item.slug %}">Подробнее</a>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="materials-empty">
+                        <p>Пока нет опубликованных тестов.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/">Вернуться на главную</a>
+        </div>
+    </footer>
+</body>
+</html>
