@@ -17,6 +17,7 @@ from .forms import (
     CuratorMaterialForm,
     LoginForm,
     MaterialPageFormSet,
+    MaterialPageFormSetCreate,
     ProfileForm,
     RegisterForm,
 )
@@ -51,6 +52,20 @@ def _build_unique_material_slug(title, current_id=None):
         index += 1
         slug = f"{base_slug}-{index}"
     return slug
+
+
+def _formset_has_non_deleted_page(formset):
+    """
+    True, если после is_valid() есть хотя бы одна страница без флага DELETE.
+    """
+    for f in formset.forms:
+        cd = getattr(f, "cleaned_data", None)
+        if not cd:
+            continue
+        if cd.get("DELETE"):
+            continue
+        return True
+    return False
 
 
 def _save_material_page_formset(formset):
@@ -408,22 +423,25 @@ def curator_material_create(request):
                 material.published_at = None
             material.content = ""
             material.save()
-            page_formset = MaterialPageFormSet(request.POST, request.FILES, instance=material)
-            if page_formset.is_valid():
+            page_formset = MaterialPageFormSetCreate(request.POST, request.FILES, instance=material)
+            if page_formset.is_valid() and _formset_has_non_deleted_page(page_formset):
                 _save_material_page_formset(page_formset)
                 success_message = "Учебный материал успешно создан."
                 form = CuratorMaterialForm()
-                page_formset = MaterialPageFormSet(instance=LearningMaterial())
+                page_formset = MaterialPageFormSetCreate(instance=LearningMaterial())
             else:
                 material.delete()
-                error_message = "Исправьте ошибки в блоках страниц (нужна хотя бы одна страница)."
+                if page_formset.is_valid() and not _formset_has_non_deleted_page(page_formset):
+                    error_message = "Добавьте хотя бы одну страницу материала."
+                else:
+                    error_message = "Исправьте ошибки в блоках страниц."
                 form = CuratorMaterialForm(request.POST, request.FILES)
-                page_formset = MaterialPageFormSet(request.POST, request.FILES)
+                page_formset = MaterialPageFormSetCreate(request.POST, request.FILES)
         else:
-            page_formset = MaterialPageFormSet(request.POST, request.FILES)
+            page_formset = MaterialPageFormSetCreate(request.POST, request.FILES)
     else:
         form = CuratorMaterialForm()
-        page_formset = MaterialPageFormSet(instance=LearningMaterial())
+        page_formset = MaterialPageFormSetCreate(instance=LearningMaterial())
     return render(
         request,
         "curator_material_create.html",

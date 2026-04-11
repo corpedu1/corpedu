@@ -170,3 +170,14 @@ MaterialPageFormSet = inlineformset_factory(
     validate_min=True,
     max_num=500,
 )
+
+MaterialPageFormSetCreate = inlineformset_factory(
+    LearningMaterial,
+    MaterialPage,
+    form=MaterialPageForm,
+    extra=0,
+    can_delete=True,
+    min_num=0,
+    validate_min=False,
+    max_num=500,
+)

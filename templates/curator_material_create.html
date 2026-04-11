@@ -7,22 +7,24 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/landing.css' %}">
 </head>
-<body>
+<body class="curator-material-create-body">
     {% include "partials/navbar.html" %}
 
     <main>
-        <section class="section admin-panel-page">
+        <section class="section admin-panel-page curator-material-create">
             <div class="container">
                 <div class="admin-layout">
                     {% include "partials/curator_navbar.html" %}
                     <div class="admin-layout__content">
-                        <p class="section-kicker">Куратор</p>
-                        <h1>Создание учебного материала</h1>
-                        <p class="section-subtitle">
-                            Заполните данные и сохраните новый материал для платформы.
-                        </p>
+                        <header class="curator-material-create__intro">
+                            <p class="section-kicker">Куратор</p>
+                            <h1>Создание учебного материала</h1>
+                            <p class="section-subtitle curator-material-create__lead">
+                                Заполните основные поля и при необходимости добавьте страницы с текстом и опциональным тестом.
+                            </p>
+                        </header>
 
-                        <article class="admin-role-card">
+                        <article class="admin-role-card admin-role-card--material-create">
                             {% if success_message %}
                                 <div class="admin-success-message">
                                     <p>{{ success_message }}</p>
@@ -40,75 +42,81 @@
                                 </div>
                             {% endif %}
 
-                            <form id="curator-material-form" method="post" action="/curator-panel/materials/create/" class="admin-role-form" enctype="multipart/form-data">
+                            <form id="curator-material-form" method="post" action="/curator-panel/materials/create/" class="admin-role-form curator-material-form" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                <div class="admin-role-form__group">
-                                    <label for="material_title">Заголовок</label>
-                                    <input type="text" name="title" id="material_title" value="{{ form.title.value|default:'' }}" required>
-                                </div>
+                                <input type="hidden" name="material_format" value="{{ form.material_format.value|default:'article' }}">
 
-                                <div class="admin-role-form__group">
-                                    <label for="material_summary">Краткое описание</label>
-                                    <textarea name="summary" id="material_summary" rows="3">{{ form.summary.value|default:'' }}</textarea>
-                                </div>
+                                <section class="curator-material-form__section" aria-labelledby="material-main-fields">
+                                    <h2 id="material-main-fields" class="curator-material-form__section-title">Данные материала</h2>
+                                    <div class="curator-material-form__section-fields">
+                                        <div class="admin-role-form__group">
+                                            <label for="material_title">Заголовок</label>
+                                            <input type="text" name="title" id="material_title" value="{{ form.title.value|default:'' }}" required>
+                                        </div>
 
-                                <div class="admin-role-form__group">
-                                    <label for="material_attachment">Файл (PDF или DOCX)</label>
-                                    <input type="file" name="attachment" id="material_attachment" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                                </div>
+                                        <div class="admin-role-form__group">
+                                            <label for="material_summary">Краткое описание</label>
+                                            <textarea name="summary" id="material_summary" rows="4" placeholder="Кратко опишите содержание">{{ form.summary.value|default:'' }}</textarea>
+                                        </div>
 
-                                <div class="admin-role-form__group">
-                                    <label for="material_format">Формат</label>
-                                    <select name="material_format" id="material_format" required>
-                                        {% for value, label in form.fields.material_format.choices %}
-                                            <option value="{{ value }}" {% if form.material_format.value == value %}selected{% endif %}>{{ label }}</option>
+                                        <div class="admin-role-form__group">
+                                            <label for="material_attachment">Файл (PDF или DOCX)</label>
+                                            <input type="file" name="attachment" id="material_attachment" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                                        </div>
+
+                                        <div class="admin-role-form__group">
+                                            <label for="material_category">Категория</label>
+                                            <select name="category" id="material_category" required>
+                                                <option value="">Выберите категорию</option>
+                                                {% for value, label in form.fields.category.choices %}
+                                                    {% if value %}
+                                                        <option value="{{ value }}" {% if form.category.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="admin-role-form__group">
+                                            <label for="material_minutes">Оценка времени, мин</label>
+                                            <input type="number" min="1" name="estimated_minutes" id="material_minutes" value="{{ form.estimated_minutes.value|default:'10' }}" required>
+                                        </div>
+
+                                        <div class="curator-material-form__checkbox-row">
+                                            <label class="curator-checkbox">
+                                                <input type="checkbox" name="is_published" {% if form.is_published.value %}checked{% endif %}>
+                                                <span>Опубликовать сразу</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section class="curator-material-form__section curator-material-form__section--pages" aria-labelledby="material-pages-heading">
+                                    <h2 id="material-pages-heading" class="curator-material-form__section-title">Страницы материала</h2>
+                                    <p class="curator-material-form__section-lead">Добавляйте страницы по одной. Заголовок страницы необязателен. Тест можно включить для любой страницы.</p>
+
+                                    {{ page_formset.management_form }}
+                                    {% if page_formset.non_form_errors %}
+                                        <div class="register-form-errors">{% for err in page_formset.non_form_errors %}<p>{{ err }}</p>{% endfor %}</div>
+                                    {% endif %}
+
+                                    <button type="button" class="curator-add-page-btn" id="material-add-page-btn">
+                                        <span class="curator-add-page-btn__icon" aria-hidden="true">+</span>
+                                        <span>Добавить страницу</span>
+                                    </button>
+
+                                    <div id="material-pages-container" class="curator-material-pages-list">
+                                        {% for pform in page_formset %}
+                                            {% include "partials/material_page_form_block.html" with pform=pform page_formset=page_formset page_num=forloop.counter %}
                                         {% endfor %}
-                                    </select>
+                                    </div>
+                                    <template id="material-page-empty-template">
+                                        {% include "partials/material_page_form_block.html" with pform=page_formset.empty_form page_formset=page_formset page_num="__PAGE_NUM__" %}
+                                    </template>
+                                </section>
+
+                                <div class="curator-material-form__submit-wrap">
+                                    <button class="register-submit curator-material-form__submit" type="submit">Сохранить материал</button>
                                 </div>
-
-                                <div class="admin-role-form__group">
-                                    <label for="material_category">Категория</label>
-                                    <select name="category" id="material_category" required>
-                                        <option value="">Выберите категорию</option>
-                                        {% for value, label in form.fields.category.choices %}
-                                            {% if value %}
-                                                <option value="{{ value }}" {% if form.category.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </div>
-
-                                <div class="admin-role-form__group">
-                                    <label for="material_minutes">Оценка времени, мин</label>
-                                    <input type="number" min="1" name="estimated_minutes" id="material_minutes" value="{{ form.estimated_minutes.value|default:'10' }}" required>
-                                </div>
-
-                                <label class="curator-checkbox">
-                                    <input type="checkbox" name="is_published" {% if form.is_published.value %}checked{% endif %}>
-                                    <span>Опубликовать сразу</span>
-                                </label>
-
-                                <h2 class="material-pages-editor__heading">Страницы материала</h2>
-                                <p class="section-subtitle material-pages-editor__hint">Добавьте страницы по необходимости (кнопка «Добавить страницу»). Текст без ограничения по объёму. На каждой странице можно загрузить изображение и опционально мини-тест (вопрос и 4 варианта).</p>
-
-                                {{ page_formset.management_form }}
-                                {% if page_formset.non_form_errors %}
-                                    <div class="register-form-errors">{% for err in page_formset.non_form_errors %}<p>{{ err }}</p>{% endfor %}</div>
-                                {% endif %}
-
-                                <div id="material-pages-container">
-                                    {% for pform in page_formset %}
-                                        {% include "partials/material_page_form_block.html" with pform=pform page_formset=page_formset page_num=forloop.counter %}
-                                    {% endfor %}
-                                </div>
-                                <template id="material-page-empty-template">
-                                    {% include "partials/material_page_form_block.html" with pform=page_formset.empty_form page_formset=page_formset page_num="__PAGE_NUM__" %}
-                                </template>
-                                <p class="material-pages-editor__add-wrap">
-                                    <button type="button" class="material-page-nav__btn" id="material-add-page-btn">Добавить страницу</button>
-                                </p>
-
-                                <button class="register-submit" type="submit">Сохранить материал</button>
                             </form>
                         </article>
                     </div>
@@ -124,6 +132,32 @@
         var container = document.getElementById("material-pages-container");
         var tmpl = document.getElementById("material-page-empty-template");
         if (!form || !btn || !container || !tmpl) return;
+
+        function syncPageAccordionTitle(acc) {
+            var input = acc.querySelector('input[name$="-title"]');
+            var detail = acc.querySelector("[data-page-title-detail]");
+            var textEl = acc.querySelector("[data-page-title-text]");
+            if (!input || !detail || !textEl) return;
+            var v = (input.value || "").trim();
+            textEl.textContent = v;
+            if (v) {
+                detail.classList.remove("material-page-accordion__title-detail--empty");
+            } else {
+                detail.classList.add("material-page-accordion__title-detail--empty");
+            }
+        }
+
+        function setCollapsed(acc, collapsed) {
+            var tBtn = acc.querySelector(".material-page-accordion__toggle");
+            if (collapsed) {
+                acc.classList.add("material-page-accordion--collapsed");
+                if (tBtn) tBtn.setAttribute("aria-expanded", "false");
+            } else {
+                acc.classList.remove("material-page-accordion--collapsed");
+                if (tBtn) tBtn.setAttribute("aria-expanded", "true");
+            }
+        }
+
         btn.addEventListener("click", function () {
             var totalInput = form.querySelector('input[name$="-TOTAL_FORMS"]');
             if (!totalInput) return;
@@ -132,7 +166,61 @@
             var html = tmpl.innerHTML.replace(/__prefix__/g, String(idx)).replace(/__PAGE_NUM__/g, String(idx + 1));
             container.insertAdjacentHTML("beforeend", html);
             totalInput.value = String(idx + 1);
+            var added = container.lastElementChild;
+            if (added && added.classList.contains("material-page-accordion")) {
+                setCollapsed(added, false);
+                var quizPanel = added.querySelector("[data-quiz-panel]");
+                var quizBtn = added.querySelector("[data-quiz-toggle]");
+                if (quizPanel) {
+                    quizPanel.setAttribute("hidden", "");
+                    quizPanel.classList.add("is-quiz-hidden");
+                }
+                if (quizBtn) {
+                    quizBtn.textContent = "Добавить quiz";
+                }
+                syncPageAccordionTitle(added);
+            }
         });
+
+        container.addEventListener("input", function (e) {
+            var inp = e.target.closest('input[name$="-title"]');
+            if (!inp) return;
+            var acc = inp.closest(".material-page-accordion");
+            if (acc) syncPageAccordionTitle(acc);
+        });
+
+        container.addEventListener("click", function (e) {
+            var toggle = e.target.closest(".material-page-accordion__toggle");
+            if (toggle) {
+                e.preventDefault();
+                var acc = toggle.closest(".material-page-accordion");
+                if (!acc) return;
+                syncPageAccordionTitle(acc);
+                var isCollapsed = acc.classList.contains("material-page-accordion--collapsed");
+                setCollapsed(acc, !isCollapsed);
+                return;
+            }
+            var quizBtn = e.target.closest("[data-quiz-toggle]");
+            if (quizBtn) {
+                e.preventDefault();
+                var acc = quizBtn.closest(".material-page-accordion");
+                if (!acc) return;
+                var panel = acc.querySelector("[data-quiz-panel]");
+                if (!panel) return;
+                var hidden = panel.hasAttribute("hidden") || panel.classList.contains("is-quiz-hidden");
+                if (hidden) {
+                    panel.removeAttribute("hidden");
+                    panel.classList.remove("is-quiz-hidden");
+                    quizBtn.textContent = "Скрыть quiz";
+                } else {
+                    panel.setAttribute("hidden", "");
+                    panel.classList.add("is-quiz-hidden");
+                    quizBtn.textContent = "Добавить quiz";
+                }
+            }
+        });
+
+        container.querySelectorAll("[data-material-page]").forEach(syncPageAccordionTitle);
     })();
     </script>
 

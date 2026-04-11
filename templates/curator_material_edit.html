@@ -28,7 +28,7 @@
                         {% endif %}
 
                         <article class="admin-role-card">
-                            <form id="curator-material-form" method="post" action="/curator-panel/materials/{{ material.slug }}/" enctype="multipart/form-data" class="admin-role-form">
+                            <form id="curator-material-form" method="post" action="/curator-panel/materials/{{ material.slug }}/" enctype="multipart/form-data" class="admin-role-form curator-material-form">
                                 {% csrf_token %}
                                 <div class="admin-role-form__group">
                                     <label for="material_title">Заголовок</label>
@@ -70,14 +70,19 @@
                                 </div>
 
                                 <h2 class="material-pages-editor__heading">Страницы материала</h2>
-                                <p class="section-subtitle material-pages-editor__hint">Любое количество страниц — при необходимости нажмите «Добавить страницу». На каждой — текст, опционально изображение и мини-тест в конце страницы.</p>
+                                <p class="section-subtitle material-pages-editor__hint">Любое количество страниц — кнопка «Добавить страницу», аккордеон и опциональный quiz на каждой странице.</p>
 
                                 {{ page_formset.management_form }}
                                 {% if page_formset.non_form_errors %}
                                     <div class="register-form-errors">{% for err in page_formset.non_form_errors %}<p>{{ err }}</p>{% endfor %}</div>
                                 {% endif %}
 
-                                <div id="material-pages-container">
+                                <button type="button" class="curator-add-page-btn" id="material-add-page-btn">
+                                    <span class="curator-add-page-btn__icon" aria-hidden="true">+</span>
+                                    <span>Добавить страницу</span>
+                                </button>
+
+                                <div id="material-pages-container" class="curator-material-pages-list">
                                     {% for pform in page_formset %}
                                         {% include "partials/material_page_form_block.html" with pform=pform page_formset=page_formset page_num=forloop.counter %}
                                     {% endfor %}
@@ -85,9 +90,6 @@
                                 <template id="material-page-empty-template">
                                     {% include "partials/material_page_form_block.html" with pform=page_formset.empty_form page_formset=page_formset page_num="__PAGE_NUM__" %}
                                 </template>
-                                <p class="material-pages-editor__add-wrap">
-                                    <button type="button" class="material-page-nav__btn" id="material-add-page-btn">Добавить страницу</button>
-                                </p>
 
                                 <button class="register-submit admin-save-button" type="submit" name="action" value="update">Сохранить изменения</button>
                             </form>
@@ -124,6 +126,32 @@
         var container = document.getElementById("material-pages-container");
         var tmpl = document.getElementById("material-page-empty-template");
         if (!form || !btn || !container || !tmpl) return;
+
+        function syncPageAccordionTitle(acc) {
+            var input = acc.querySelector('input[name$="-title"]');
+            var detail = acc.querySelector("[data-page-title-detail]");
+            var textEl = acc.querySelector("[data-page-title-text]");
+            if (!input || !detail || !textEl) return;
+            var v = (input.value || "").trim();
+            textEl.textContent = v;
+            if (v) {
+                detail.classList.remove("material-page-accordion__title-detail--empty");
+            } else {
+                detail.classList.add("material-page-accordion__title-detail--empty");
+            }
+        }
+
+        function setCollapsed(acc, collapsed) {
+            var tBtn = acc.querySelector(".material-page-accordion__toggle");
+            if (collapsed) {
+                acc.classList.add("material-page-accordion--collapsed");
+                if (tBtn) tBtn.setAttribute("aria-expanded", "false");
+            } else {
+                acc.classList.remove("material-page-accordion--collapsed");
+                if (tBtn) tBtn.setAttribute("aria-expanded", "true");
+            }
+        }
+
         btn.addEventListener("click", function () {
             var totalInput = form.querySelector('input[name$="-TOTAL_FORMS"]');
             if (!totalInput) return;
@@ -132,7 +160,61 @@
             var html = tmpl.innerHTML.replace(/__prefix__/g, String(idx)).replace(/__PAGE_NUM__/g, String(idx + 1));
             container.insertAdjacentHTML("beforeend", html);
             totalInput.value = String(idx + 1);
+            var added = container.lastElementChild;
+            if (added && added.classList.contains("material-page-accordion")) {
+                setCollapsed(added, false);
+                var quizPanel = added.querySelector("[data-quiz-panel]");
+                var quizBtn = added.querySelector("[data-quiz-toggle]");
+                if (quizPanel) {
+                    quizPanel.setAttribute("hidden", "");
+                    quizPanel.classList.add("is-quiz-hidden");
+                }
+                if (quizBtn) {
+                    quizBtn.textContent = "Добавить quiz";
+                }
+                syncPageAccordionTitle(added);
+            }
         });
+
+        container.addEventListener("input", function (e) {
+            var inp = e.target.closest('input[name$="-title"]');
+            if (!inp) return;
+            var acc = inp.closest(".material-page-accordion");
+            if (acc) syncPageAccordionTitle(acc);
+        });
+
+        container.addEventListener("click", function (e) {
+            var toggle = e.target.closest(".material-page-accordion__toggle");
+            if (toggle) {
+                e.preventDefault();
+                var acc = toggle.closest(".material-page-accordion");
+                if (!acc) return;
+                syncPageAccordionTitle(acc);
+                var isCollapsed = acc.classList.contains("material-page-accordion--collapsed");
+                setCollapsed(acc, !isCollapsed);
+                return;
+            }
+            var quizBtn = e.target.closest("[data-quiz-toggle]");
+            if (quizBtn) {
+                e.preventDefault();
+                var acc = quizBtn.closest(".material-page-accordion");
+                if (!acc) return;
+                var panel = acc.querySelector("[data-quiz-panel]");
+                if (!panel) return;
+                var hidden = panel.hasAttribute("hidden") || panel.classList.contains("is-quiz-hidden");
+                if (hidden) {
+                    panel.removeAttribute("hidden");
+                    panel.classList.remove("is-quiz-hidden");
+                    quizBtn.textContent = "Скрыть quiz";
+                } else {
+                    panel.setAttribute("hidden", "");
+                    panel.classList.add("is-quiz-hidden");
+                    quizBtn.textContent = "Добавить quiz";
+                }
+            }
+        });
+
+        container.querySelectorAll("[data-material-page]").forEach(syncPageAccordionTitle);
     })();
     </script>
 

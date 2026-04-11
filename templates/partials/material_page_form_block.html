@@ -1,59 +1,90 @@
-{# Ожидает: pform, page_formset, page_num (число или плейсхолдер __PAGE_NUM__ для JS) #}
-<div class="material-page-editor">
+{# pform, page_formset, page_num — число или __PAGE_NUM__ для JS #}
+<div class="material-page-accordion" data-material-page>
     {% for hidden in pform.hidden_fields %}{{ hidden }}{% endfor %}
-    <h3 class="material-page-editor__title">Страница {{ page_num }}</h3>
-    {% if page_formset.can_delete and pform.instance.pk %}
-        <label class="curator-checkbox material-page-editor__delete">
-            {{ pform.DELETE }} <span>Удалить страницу</span>
-        </label>
-    {% endif %}
-    <div class="admin-role-form__group">
-        <label for="{{ pform.title.id_for_label }}">Заголовок страницы (необязательно)</label>
-        {{ pform.title }}
-        {% if pform.title.errors %}<span class="field-error">{{ pform.title.errors.0 }}</span>{% endif %}
-    </div>
-    <div class="admin-role-form__group">
-        <label for="{{ pform.body.id_for_label }}">Текст страницы</label>
-        {{ pform.body }}
-        {% if pform.body.errors %}<span class="field-error">{{ pform.body.errors.0 }}</span>{% endif %}
-    </div>
-    <div class="admin-role-form__group">
-        <label for="{{ pform.image.id_for_label }}">Изображение (JPG, PNG, GIF, WEBP)</label>
-        {{ pform.image }}
-        {% if pform.instance.image %}
-            <p class="material-page-editor__preview"><img src="{{ pform.instance.image.url }}" alt="" class="material-page-editor__thumb"></p>
+    <div class="material-page-accordion__header">
+        <button type="button" class="material-page-accordion__toggle" aria-expanded="true">
+            <span class="material-page-accordion__title-wrap">
+                <span class="material-page-accordion__label">Страница {{ page_num }}</span>
+                {% with disp=pform.title.value|default:pform.instance.title|default:'' %}
+                <span class="material-page-accordion__title-detail{% if not disp %} material-page-accordion__title-detail--empty{% endif %}" data-page-title-detail>
+                    <span class="material-page-accordion__title-sep"> — </span>«<span data-page-title-text>{{ disp }}</span>»
+                </span>
+                {% endwith %}
+            </span>
+            <span class="material-page-accordion__chevron" aria-hidden="true"></span>
+        </button>
+        {% if page_formset.can_delete and pform.instance.pk %}
+            <label class="curator-checkbox material-page-accordion__delete">
+                {{ pform.DELETE }} <span>Удалить</span>
+            </label>
         {% endif %}
-        {% if pform.image.errors %}<span class="field-error">{{ pform.image.errors.0 }}</span>{% endif %}
     </div>
-    <p class="material-page-editor__quiz-title">Мини-тест (необязательно)</p>
-    <div class="admin-role-form__group">
-        <label for="{{ pform.quiz_question.id_for_label }}">Вопрос</label>
-        {{ pform.quiz_question }}
+    <div class="material-page-accordion__body">
+        <div class="material-page-accordion__fields">
+            <div class="admin-role-form__group">
+                <label for="{{ pform.title.id_for_label }}">Заголовок страницы</label>
+                {{ pform.title }}
+                {% if pform.title.errors %}<span class="field-error">{{ pform.title.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="admin-role-form__group">
+                <label for="{{ pform.body.id_for_label }}">Текст страницы</label>
+                {{ pform.body }}
+                {% if pform.body.errors %}<span class="field-error">{{ pform.body.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="admin-role-form__group">
+                <label for="{{ pform.image.id_for_label }}">Изображение</label>
+                {{ pform.image }}
+                {% if pform.instance.image %}
+                    <p class="material-page-editor__preview"><img src="{{ pform.instance.image.url }}" alt="" class="material-page-editor__thumb"></p>
+                {% endif %}
+                {% if pform.image.errors %}<span class="field-error">{{ pform.image.errors.0 }}</span>{% endif %}
+            </div>
+        </div>
+
+        <button type="button" class="material-page-editor__quiz-toggle" data-quiz-toggle>
+            {% if pform.instance.has_quiz or pform.quiz_question.errors or pform.quiz_correct.errors or pform.quiz_choice_1.errors or pform.quiz_choice_2.errors or pform.quiz_choice_3.errors or pform.quiz_choice_4.errors or pform.quiz_question.value %}
+                Скрыть quiz
+            {% else %}
+                Добавить quiz
+            {% endif %}
+        </button>
+
+        <div class="material-page-editor__quiz-block{% if not pform.instance.has_quiz and not pform.quiz_question.errors and not pform.quiz_correct.errors and not pform.quiz_choice_1.errors and not pform.quiz_choice_2.errors and not pform.quiz_choice_3.errors and not pform.quiz_choice_4.errors and not pform.quiz_question.value %} is-quiz-hidden{% endif %}" data-quiz-panel
+            {% if not pform.instance.has_quiz and not pform.quiz_question.errors and not pform.quiz_correct.errors and not pform.quiz_choice_1.errors and not pform.quiz_choice_2.errors and not pform.quiz_choice_3.errors and not pform.quiz_choice_4.errors and not pform.quiz_question.value %}
+                hidden
+            {% endif %}>
+            <p class="material-page-editor__quiz-lead">Мини-тест в конце страницы (необязательно)</p>
+            <div class="admin-role-form__group">
+                <label for="{{ pform.quiz_question.id_for_label }}">Вопрос</label>
+                {{ pform.quiz_question }}
+            </div>
+            <div class="admin-role-form__grid2">
+                <div class="admin-role-form__group">
+                    <label for="{{ pform.quiz_choice_1.id_for_label }}">Вариант 1</label>
+                    {{ pform.quiz_choice_1 }}
+                </div>
+                <div class="admin-role-form__group">
+                    <label for="{{ pform.quiz_choice_2.id_for_label }}">Вариант 2</label>
+                    {{ pform.quiz_choice_2 }}
+                </div>
+                <div class="admin-role-form__group">
+                    <label for="{{ pform.quiz_choice_3.id_for_label }}">Вариант 3</label>
+                    {{ pform.quiz_choice_3 }}
+                </div>
+                <div class="admin-role-form__group">
+                    <label for="{{ pform.quiz_choice_4.id_for_label }}">Вариант 4</label>
+                    {{ pform.quiz_choice_4 }}
+                </div>
+            </div>
+            <div class="admin-role-form__group">
+                <label for="{{ pform.quiz_correct.id_for_label }}">Верный ответ (номер)</label>
+                {{ pform.quiz_correct }}
+                {% if pform.quiz_correct.errors %}<span class="field-error">{{ pform.quiz_correct.errors.0 }}</span>{% endif %}
+            </div>
+        </div>
+
+        {% if pform.non_field_errors %}
+            <div class="register-form-errors">{% for err in pform.non_field_errors %}<p>{{ err }}</p>{% endfor %}</div>
+        {% endif %}
     </div>
-    <div class="admin-role-form__grid2">
-        <div class="admin-role-form__group">
-            <label for="{{ pform.quiz_choice_1.id_for_label }}">Вариант 1</label>
-            {{ pform.quiz_choice_1 }}
-        </div>
-        <div class="admin-role-form__group">
-            <label for="{{ pform.quiz_choice_2.id_for_label }}">Вариант 2</label>
-            {{ pform.quiz_choice_2 }}
-        </div>
-        <div class="admin-role-form__group">
-            <label for="{{ pform.quiz_choice_3.id_for_label }}">Вариант 3</label>
-            {{ pform.quiz_choice_3 }}
-        </div>
-        <div class="admin-role-form__group">
-            <label for="{{ pform.quiz_choice_4.id_for_label }}">Вариант 4</label>
-            {{ pform.quiz_choice_4 }}
-        </div>
-    </div>
-    <div class="admin-role-form__group">
-        <label for="{{ pform.quiz_correct.id_for_label }}">Верный ответ (номер)</label>
-        {{ pform.quiz_correct }}
-        {% if pform.quiz_correct.errors %}<span class="field-error">{{ pform.quiz_correct.errors.0 }}</span>{% endif %}
-    </div>
-    {% if pform.non_field_errors %}
-        <div class="register-form-errors">{% for err in pform.non_field_errors %}<p>{{ err }}</p>{% endfor %}</div>
-    {% endif %}
 </div>
