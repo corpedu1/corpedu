@@ -441,6 +441,16 @@ a {
     line-height: 1.6;
 }
 
+.admin-panel-page .section-subtitle a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.admin-panel-page .section-subtitle a:hover {
+    text-decoration: underline;
+}
+
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -2800,6 +2810,126 @@ a {
 .admin-categories-table input[type="number"]:focus {
     outline: none;
     border-color: #0ea5e9;
+}
+
+.feedback-page-message {
+    margin-bottom: 1.25rem;
+    max-width: 40rem;
+}
+
+.feedback-form-errors {
+    margin-bottom: 1rem;
+    max-width: 40rem;
+}
+
+.feedback-field-errors {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    color: #b91c1c;
+    font-size: 0.9rem;
+}
+
+.feedback-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.feedback-status--new {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.feedback-status--in_progress {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.feedback-status--resolved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.feedback-status--closed {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.admin-feedback-table-wrap {
+    margin-top: 8px;
+}
+
+.admin-feedback-table__subject {
+    max-width: 280px;
+}
+
+.admin-feedback-table tbody td a {
+    font-weight: 600;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.admin-feedback-table tbody td a:hover {
+    text-decoration: underline;
+}
+
+.admin-feedback-detail__dl {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 10px 16px;
+    margin: 0;
+}
+
+.admin-feedback-detail__dl dt {
+    margin: 0;
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.88rem;
+}
+
+.admin-feedback-detail__dl dd {
+    margin: 0;
+    color: #0f172a;
+}
+
+.admin-feedback-detail__message {
+    line-height: 1.55;
+}
+
+.admin-feedback-detail__status-form {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.admin-feedback-detail__status-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+}
+
+.admin-feedback-detail__status-row label {
+    font-weight: 700;
+    color: #334155;
+}
+
+.admin-feedback-detail__status-row select {
+    min-width: 200px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 600px) {
+    .admin-feedback-detail__dl {
+        grid-template-columns: 1fr;
+    }
 }
 
 .admin-table-form {

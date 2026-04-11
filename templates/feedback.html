@@ -15,31 +15,44 @@
             <div class="container">
                 <p class="section-kicker">Форма</p>
                 <h1>Обратная связь</h1>
-                <p class="section-subtitle">Оставьте сообщение, и мы свяжемся с вами. На данном этапе форма работает только как frontend.</p>
+                <p class="section-subtitle">Оставьте сообщение — обращение будет передано администраторам платформы.</p>
 
-                <form class="feedback-form" action="#" method="post">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="admin-success-message feedback-page-message" role="status">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form class="feedback-form" method="post" action="{% url 'feedback' %}">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="register-form-errors feedback-form-errors">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
                     <div class="feedback-form__grid">
-                        <div class="feedback-field">
-                            <label for="feedback_name">Имя</label>
-                            <input id="feedback_name" name="name" type="text" placeholder="Введите имя">
-                        </div>
-                        <div class="feedback-field">
-                            <label for="feedback_phone">Телефон</label>
-                            <input id="feedback_phone" name="phone" type="tel" placeholder="+7 (___) ___-__-__">
-                        </div>
-                        <div class="feedback-field">
-                            <label for="feedback_email">Почта</label>
-                            <input id="feedback_email" name="email" type="email" placeholder="example@mail.ru">
-                        </div>
-                        <div class="feedback-field">
-                            <label for="feedback_subject">Тема</label>
-                            <input id="feedback_subject" name="subject" type="text" placeholder="Тема обращения">
-                        </div>
+                        {% for field in form %}
+                            {% if field.name != 'message' %}
+                                <div class="feedback-field">
+                                    {{ field.label_tag }}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <ul class="feedback-field-errors">{% for err in field.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
 
                     <div class="feedback-field">
-                        <label for="feedback_message">Текст</label>
-                        <textarea id="feedback_message" name="message" rows="7" placeholder="Введите текст сообщения"></textarea>
+                        {{ form.message.label_tag }}
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                            <ul class="feedback-field-errors">{% for err in form.message.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                        {% endif %}
                     </div>
 
                     <button class="feedback-submit" type="submit">Отправить</button>

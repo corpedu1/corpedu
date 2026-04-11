@@ -462,3 +462,51 @@ class KnowledgeTestAttemptAnswer(models.Model):
 
     def __str__(self):
         return f"attempt {self.attempt_id} · Q{self.question_id}"
+
+
+class FeedbackSubmissionStatus(models.TextChoices):
+    """
+    Статус обращения из формы обратной связи.
+    """
+
+    NEW = "new", "Новая"
+    IN_PROGRESS = "in_progress", "В работе"
+    RESOLVED = "resolved", "Выполнено"
+    CLOSED = "closed", "Закрыто"
+
+
+class FeedbackSubmission(models.Model):
+    """
+    Сообщение пользователя, отправленное через форму «Обратная связь».
+    """
+
+    name = models.CharField(max_length=120, verbose_name="Имя")
+    phone = models.CharField(max_length=40, blank=True, verbose_name="Телефон")
+    email = models.EmailField(blank=True, verbose_name="Электронная почта")
+    subject = models.CharField(max_length=255, verbose_name="Тема")
+    message = models.TextField(verbose_name="Текст сообщения")
+    status = models.CharField(
+        max_length=20,
+        choices=FeedbackSubmissionStatus.choices,
+        default=FeedbackSubmissionStatus.NEW,
+        verbose_name="Статус",
+        db_index=True,
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="feedback_submissions",
+        verbose_name="Пользователь (если был авторизован)",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата отправки")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+
+    class Meta:
+        verbose_name = "Обращение (обратная связь)"
+        verbose_name_plural = "Обращения (обратная связь)"
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"{self.subject} ({self.get_status_display()})"

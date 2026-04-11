@@ -6,7 +6,7 @@ from django import forms
 from django.contrib.auth import authenticate, get_user_model
 from django.forms import inlineformset_factory
 
-from .models import KnowledgeTest, LearningMaterial, MaterialPage
+from .models import FeedbackSubmission, KnowledgeTest, LearningMaterial, MaterialPage
 
 
 User = get_user_model()
@@ -233,3 +233,48 @@ class KnowledgeTestQuestionEntryForm(forms.Form):
             if not val:
                 self.add_error(key, "Заполните все варианты ответа.")
         return cleaned
+
+
+class PublicFeedbackForm(forms.ModelForm):
+    """
+    Публичная форма «Обратная связь» (сохранение в БД для администраторов).
+    """
+
+    class Meta:
+        model = FeedbackSubmission
+        fields = ("name", "phone", "email", "subject", "message")
+        labels = {
+            "name": "Имя",
+            "phone": "Телефон",
+            "email": "Почта",
+            "subject": "Тема",
+            "message": "Текст",
+        }
+        widgets = {
+            "name": forms.TextInput(attrs={"placeholder": "Введите имя"}),
+            "phone": forms.TextInput(attrs={"placeholder": "+7 (___) ___-__-__"}),
+            "email": forms.EmailInput(attrs={"placeholder": "example@mail.ru"}),
+            "subject": forms.TextInput(attrs={"placeholder": "Тема обращения"}),
+            "message": forms.Textarea(attrs={"rows": 7, "placeholder": "Введите текст сообщения"}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        phone = (cleaned_data.get("phone") or "").strip()
+        email = (cleaned_data.get("email") or "").strip()
+        if not phone and not email:
+            raise forms.ValidationError(
+                "Укажите телефон или электронную почту, чтобы мы могли с вами связаться."
+            )
+        return cleaned_data
+
+
+class AdminFeedbackStatusForm(forms.ModelForm):
+    """
+    Смена статуса обращения администратором.
+    """
+
+    class Meta:
+        model = FeedbackSubmission
+        fields = ("status",)
+        labels = {"status": "Статус обращения"}

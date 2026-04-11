@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обращение №{{ submission.pk }} | Админ панель</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section admin-panel-page">
+            <div class="container">
+                <div class="admin-layout">
+                    {% include "partials/admin_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Администрирование</p>
+                        <h1>Обращение №{{ submission.pk }}</h1>
+                        <p class="section-subtitle">
+                            <a href="{% url 'admin_feedback_submissions' %}">← К списку обращений</a>
+                        </p>
+
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="admin-success-message admin-message-space" role="status">
+                                    <p>{{ message }}</p>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <article class="admin-role-card admin-feedback-detail">
+                            <dl class="admin-feedback-detail__dl">
+                                <dt>Статус</dt>
+                                <dd>
+                                    <span class="feedback-status feedback-status--{{ submission.status }}">{{ submission.get_status_display }}</span>
+                                </dd>
+                                <dt>Дата отправки</dt>
+                                <dd>{{ submission.created_at|date:"d.m.Y H:i" }}</dd>
+                                <dt>Имя</dt>
+                                <dd>{{ submission.name }}</dd>
+                                <dt>Телефон</dt>
+                                <dd>{% if submission.phone %}{{ submission.phone }}{% else %}—{% endif %}</dd>
+                                <dt>Почта</dt>
+                                <dd>{% if submission.email %}{{ submission.email }}{% else %}—{% endif %}</dd>
+                                <dt>Тема</dt>
+                                <dd>{{ submission.subject }}</dd>
+                                <dt>Текст сообщения</dt>
+                                <dd class="admin-feedback-detail__message">{{ submission.message|linebreaksbr }}</dd>
+                                <dt>Пользователь платформы</dt>
+                                <dd>
+                                    {% if submission.user %}
+                                        {{ submission.user.username }}
+                                        {% if submission.user.first_name or submission.user.last_name %}
+                                            ({{ submission.user.first_name }} {{ submission.user.last_name }})
+                                        {% endif %}
+                                    {% else %}
+                                        Не авторизован / не указан
+                                    {% endif %}
+                                </dd>
+                            </dl>
+
+                            <form method="post" action="{% url 'admin_feedback_detail' submission.pk %}" class="admin-feedback-detail__status-form">
+                                {% csrf_token %}
+                                <div class="admin-feedback-detail__status-row">
+                                    {{ status_form.status.label_tag }}
+                                    {{ status_form.status }}
+                                    <button class="register-submit admin-save-button" type="submit">Сохранить статус</button>
+                                </div>
+                                {% if status_form.status.errors %}
+                                    <div class="register-form-errors"><p>{{ status_form.status.errors }}</p></div>
+                                {% endif %}
+                            </form>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin-panel/feedback/">К списку обращений</a>
+        </div>
+    </footer>
+</body>
+</html>

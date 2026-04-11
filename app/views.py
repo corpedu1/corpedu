@@ -4,6 +4,7 @@
 
 import json
 
+from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
@@ -20,6 +21,7 @@ from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
 from .forms import (
+    AdminFeedbackStatusForm,
     CuratorKnowledgeTestForm,
     CuratorMaterialForm,
     KnowledgeTestQuestionEntryForm,
@@ -27,9 +29,11 @@ from .forms import (
     MaterialPageFormSet,
     MaterialPageFormSetCreate,
     ProfileForm,
+    PublicFeedbackForm,
     RegisterForm,
 )
 from .models import (
+    FeedbackSubmission,
     KnowledgeTest,
     KnowledgeTestAnswerChoice,
     KnowledgeTestAttempt,
@@ -190,9 +194,23 @@ def contacts(request):
 
 def feedback(request):
     """
-    Отображает страницу «Обратная связь».
+    Страница «Обратная связь»: сохранение обращений в БД для администраторов.
     """
-    return render(request, "feedback.html")
+    if request.method == "POST":
+        form = PublicFeedbackForm(request.POST)
+        if form.is_valid():
+            submission = form.save(commit=False)
+            if request.user.is_authenticated:
+                submission.user = request.user
+            submission.save()
+            messages.success(
+                request,
+                "Сообщение отправлено. Мы свяжемся с вами при необходимости.",
+            )
+            return redirect("feedback")
+    else:
+        form = PublicFeedbackForm()
+    return render(request, "feedback.html", {"form": form})
 
 
 def faq(request):
@@ -688,6 +706,50 @@ def admin_panel(request):
         "tests_count": KnowledgeTest.objects.count(),
     }
     return render(request, "admin_panel.html", context)
+
+
+@login_required
+def admin_feedback_submissions(request):
+    """
+    Список обращений из формы обратной связи (только администраторы).
+    """
+    if not _is_administrator(request.user):
+        return redirect("landing")
+    submissions = FeedbackSubmission.objects.select_related("user").all()
+    return render(
+        request,
+        "admin_feedback_list.html",
+        {"submissions": submissions},
+    )
+
+
+@login_required
+def admin_feedback_detail(request, pk):
+    """
+    Просмотр обращения и смена статуса.
+    """
+    if not _is_administrator(request.user):
+        return redirect("landing")
+    submission = get_object_or_404(
+        FeedbackSubmission.objects.select_related("user"),
+        pk=pk,
+    )
+    if request.method == "POST":
+        status_form = AdminFeedbackStatusForm(request.POST, instance=submission)
+        if status_form.is_valid():
+            status_form.save()
+            messages.success(request, "Статус обновлён.")
+            return redirect("admin_feedback_detail", pk=pk)
+    else:
+        status_form = AdminFeedbackStatusForm(instance=submission)
+    return render(
+        request,
+        "admin_feedback_detail.html",
+        {
+            "submission": submission,
+            "status_form": status_form,
+        },
+    )
 
 
 @login_required
