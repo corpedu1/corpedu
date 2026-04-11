@@ -22,6 +22,33 @@
                             <p class="section-subtitle">{{ test.title }}</p>
                         </header>
 
+                        <div class="curator-test-publish-banner">
+                            <div class="curator-test-publish-banner__status">
+                                {% if test.is_published %}
+                                    <span class="curator-test-badge curator-test-badge--published curator-test-badge--large">
+                                        <span class="curator-test-badge__icon" aria-hidden="true">✓</span> Опубликован
+                                    </span>
+                                    <p class="curator-test-publish-banner__hint">Тест отображается в разделе «Тесты» для всех пользователей.</p>
+                                {% else %}
+                                    <span class="curator-test-badge curator-test-badge--draft curator-test-badge--large">
+                                        <span class="curator-test-badge__icon" aria-hidden="true">○</span> Черновик
+                                    </span>
+                                    <p class="curator-test-publish-banner__hint">Тест не виден в общем каталоге, пока вы не опубликуете его.</p>
+                                {% endif %}
+                            </div>
+                            <form method="post" action="{% url 'curator_knowledge_test_set_publish' test.slug %}" class="curator-test-publish-banner__form">
+                                {% csrf_token %}
+                                {% if test.is_published %}
+                                    <input type="hidden" name="publish" value="0">
+                                    <button type="submit" class="curator-test-publish-btn curator-test-publish-btn--secondary curator-test-publish-btn--banner">Снять с публикации</button>
+                                {% else %}
+                                    <input type="hidden" name="publish" value="1">
+                                    <button type="submit" class="curator-test-publish-btn curator-test-publish-btn--primary curator-test-publish-btn--banner">Опубликовать</button>
+                                {% endif %}
+                                <input type="hidden" name="next_page" value="edit">
+                            </form>
+                        </div>
+
                         {% if success_message %}
                             <div class="admin-success-message"><p>{{ success_message }}</p></div>
                         {% endif %}
@@ -35,6 +62,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="save_test">
                                 {% for field in test_form %}
+                                    {% if field.name != "is_published" %}
                                     <div class="admin-role-form__group">
                                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                                         {{ field }}
@@ -42,6 +70,7 @@
                                             <span class="register-field-error">{{ field.errors.0 }}</span>
                                         {% endif %}
                                     </div>
+                                    {% endif %}
                                 {% endfor %}
                                 <button type="submit" class="register-submit curator-material-form__submit">Сохранить тест</button>
                             </form>
@@ -90,6 +119,15 @@
                                     </div>
                                 {% endfor %}
                                 <button type="submit" class="register-submit curator-material-form__submit">Добавить вопрос</button>
+                            </form>
+                        </article>
+
+                        <article class="admin-role-card admin-message-space">
+                            <h3>Удаление теста</h3>
+                            <p class="section-subtitle" style="margin: 0 0 0.75rem;">Будут удалены все вопросы, варианты ответов и связанные попытки прохождения.</p>
+                            <form method="post" action="{% url 'curator_knowledge_test_edit' test.slug %}">
+                                {% csrf_token %}
+                                <button class="register-submit admin-delete-button" type="submit" name="action" value="delete" onclick="return confirm('Удалить этот тест безвозвратно?');">Удалить тест</button>
                             </form>
                         </article>
 

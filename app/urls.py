@@ -45,6 +45,7 @@ urlpatterns = [
     path('curator-panel/materials/<slug:slug>/', views.curator_material_edit, name='curator_material_edit'),
     path('curator-panel/tests/', views.curator_knowledge_tests_manage, name='curator_knowledge_tests_manage'),
     path('curator-panel/tests/create/', views.curator_knowledge_test_create, name='curator_knowledge_test_create'),
+    path('curator-panel/tests/<slug:slug>/publish/', views.curator_knowledge_test_set_publish, name='curator_knowledge_test_set_publish'),
     path('curator-panel/tests/<slug:slug>/edit/', views.curator_knowledge_test_edit, name='curator_knowledge_test_edit'),
     path('admin/', admin.site.urls),
 ]

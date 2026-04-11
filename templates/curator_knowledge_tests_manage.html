@@ -18,21 +18,45 @@
                     <div class="admin-layout__content">
                         <p class="section-kicker">Куратор</p>
                         <h1>Тесты</h1>
-                        <p class="section-subtitle">Выберите тест для редактирования вопросов и настроек.</p>
+                        <p class="section-subtitle">Выберите тест для редактирования. Статус публикации виден на карточке.</p>
 
                         {% if tests %}
-                            <div class="curator-material-list">
+                            <div class="curator-test-manage-list">
                                 {% for item in tests %}
-                                    <a class="curator-material-list__item" href="{% url 'curator_knowledge_test_edit' item.slug %}">
-                                        <div>
-                                            <h3>{{ item.title }}</h3>
-                                            <p>{{ item.summary|default:"Описание отсутствует." }}</p>
+                                    <div class="curator-test-manage-card">
+                                        <a class="curator-test-manage-card__main" href="{% url 'curator_knowledge_test_edit' item.slug %}">
+                                            <div>
+                                                <h3>{{ item.title }}</h3>
+                                                <p>{{ item.summary|default:"Описание отсутствует." }}</p>
+                                            </div>
+                                            <div class="curator-material-list__meta">
+                                                <span>{{ item.category.name }}</span>
+                                            </div>
+                                        </a>
+                                        <div class="curator-test-manage-card__publish">
+                                            {% if item.is_published %}
+                                                <span class="curator-test-badge curator-test-badge--published" title="Виден в общем списке тестов">
+                                                    <span class="curator-test-badge__icon" aria-hidden="true">✓</span> Опубликован
+                                                </span>
+                                                <form method="post" action="{% url 'curator_knowledge_test_set_publish' item.slug %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="publish" value="0">
+                                                    <input type="hidden" name="next_page" value="manage">
+                                                    <button type="submit" class="curator-test-publish-btn curator-test-publish-btn--secondary">Снять с публикации</button>
+                                                </form>
+                                            {% else %}
+                                                <span class="curator-test-badge curator-test-badge--draft" title="Не виден посетителям">
+                                                    <span class="curator-test-badge__icon" aria-hidden="true">○</span> Черновик
+                                                </span>
+                                                <form method="post" action="{% url 'curator_knowledge_test_set_publish' item.slug %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="publish" value="1">
+                                                    <input type="hidden" name="next_page" value="manage">
+                                                    <button type="submit" class="curator-test-publish-btn curator-test-publish-btn--primary">Опубликовать</button>
+                                                </form>
+                                            {% endif %}
                                         </div>
-                                        <div class="curator-material-list__meta">
-                                            <span>{{ item.category.name }}</span>
-                                            <span>{% if item.is_published %}Опубликован{% else %}Черновик{% endif %}</span>
-                                        </div>
-                                    </a>
+                                    </div>
                                 {% endfor %}
                             </div>
                         {% else %}

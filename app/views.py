@@ -709,6 +709,32 @@ def curator_knowledge_tests_manage(request):
 
 
 @login_required
+@require_POST
+def curator_knowledge_test_set_publish(request, slug):
+    """
+    Публикация или снятие теста с публикации (только автор-куратор).
+    """
+    if not _is_curator(request.user):
+        return redirect("landing")
+    test = get_object_or_404(KnowledgeTest, slug=slug, author=request.user)
+    publish = request.POST.get("publish")
+    if publish == "1":
+        test.is_published = True
+        if test.published_at is None:
+            test.published_at = timezone.now()
+    elif publish == "0":
+        test.is_published = False
+        test.published_at = None
+    else:
+        return redirect("curator_knowledge_tests_manage")
+    test.save(update_fields=["is_published", "published_at", "updated_at"])
+    next_page = request.POST.get("next_page", "manage")
+    if next_page == "edit":
+        return redirect("curator_knowledge_test_edit", slug=test.slug)
+    return redirect("curator_knowledge_tests_manage")
+
+
+@login_required
 def curator_knowledge_test_create(request):
     """
     Создание платформенного теста: после сохранения — переход к редактированию вопросов.
@@ -753,6 +779,9 @@ def curator_knowledge_test_edit(request, slug):
 
     if request.method == "POST":
         action = request.POST.get("action", "").strip()
+        if action == "delete":
+            test.delete()
+            return redirect("curator_knowledge_tests_manage")
         if action == "delete_question":
             qid = request.POST.get("question_id")
             try:
@@ -790,10 +819,9 @@ def curator_knowledge_test_edit(request, slug):
                 updated = test_form.save(commit=False)
                 updated.author = request.user
                 updated.slug = _build_unique_knowledge_test_slug(updated.title, current_id=updated.id)
-                if updated.is_published and updated.published_at is None:
-                    updated.published_at = timezone.now()
-                if not updated.is_published:
-                    updated.published_at = None
+                # Публикация только через кнопку на странице / списке, не через эту форму
+                updated.is_published = test.is_published
+                updated.published_at = test.published_at
                 updated.save()
                 test = updated
                 success_message = "Данные теста сохранены."
