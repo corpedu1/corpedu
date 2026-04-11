@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для организаций | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="organizations-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section organizations-intro">
+            <div class="container">
+                <p class="section-kicker">B2B</p>
+                <h1>Для организаций</h1>
+                <p class="section-subtitle">
+                    <strong>CyberLearn Витте</strong> — поставщик корпоративных услуг в сфере обучения по информационной безопасности.
+                    Мы предоставляем другим компаниям доступ к единой веб-платформе: учебные материалы, проверка знаний и управление
+                    программами обучения для сотрудников в формате B2B.
+                </p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">Модель</p>
+                <h2>Как это работает для заказчика</h2>
+                <p class="section-subtitle">
+                    Организация-заказчик подключает персонал к платформе: кураторы и администраторы со стороны компании ведут программы,
+                    а сотрудники проходят обучение и тесты в личном кабинете. CyberLearn Витте выступает как сервисная среда для доставки контента и контроля результатов.
+                </p>
+                <ol class="panel__list">
+                    <li>Единый стандарт ИБ-обучения для подразделений и филиалов заказчика.</li>
+                    <li>Прозрачные роли: кто настраивает доступ и материалы, кто проходит курсы и тесты.</li>
+                    <li>Фиксация прогресса и результатов для внутренней отчётности и аудита знаний.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="section section--accent">
+            <div class="container">
+                <p class="section-kicker">Формат</p>
+                <h2>Что входит в сервис</h2>
+                <p class="section-subtitle">Ключевые элементы платформы для корпоративного заказчика.</p>
+                <div class="security-grid">
+                    <div class="security-item">
+                        <h3>Обучающие программы</h3>
+                        <p>Тематические материалы и модули по ИБ, адаптируемые под регламенты вашей организации.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Тестирование</h3>
+                        <p>Проверка знаний с фиксацией попыток и результатов для групп сотрудников.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Управление доступом</h3>
+                        <p>Ролевые кабинеты для администратора, куратора и сотрудника в рамках одной организации.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">Кому подходит</p>
+                <h2>Типичные сценарии</h2>
+                <p class="section-subtitle">
+                    Сервис ориентирован на компании, которым нужно регулярное обучение персонала по ИБ и доказуемый контроль уровня знаний —
+                    от подготовки к требованиям регуляторов до снижения инцидентов социальной инженерии и утечек данных.
+                </p>
+                <ul class="organizations-page__list">
+                    <li>Службы информационной безопасности и ИТ: единая точка для программ повышения осведомлённости.</li>
+                    <li>HR и внутреннее обучение: массовое подключение сотрудников и отчёты по подразделениям.</li>
+                    <li>Руководители: видимость динамики прохождения обязательных модулей.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section organizations-cta">
+            <div class="container">
+                <p class="section-kicker">Связь</p>
+                <h2>Обсудить подключение</h2>
+                <p class="section-subtitle">
+                    Напишите нам через <a href="/feedback/">форму обратной связи</a> или воспользуйтесь
+                    <a href="/contacts/">контактами</a>. Кратко о подходе к платформе — в разделе
+                    <a href="{% url 'advantages' %}">Преимущества</a> и на странице <a href="{% url 'security' %}">Безопасность</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin/">Перейти к авторизации</a>
+        </div>
+    </footer>
+</body>
+</html>

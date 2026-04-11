@@ -290,6 +290,13 @@ def security(request):
     return render(request, "security.html")
 
 
+def organizations(request):
+    """
+    Страница «Для организаций»: модель B2B — обучение по ИБ для корпоративных заказчиков.
+    """
+    return render(request, "organizations.html")
+
+
 def contacts(request):
     """
     Отображает страницу «Контакты».
