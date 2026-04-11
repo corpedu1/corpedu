@@ -42,21 +42,21 @@
                         {% csrf_token %}
                         <div class="register-input-group">
                             <label for="settings_old_password">Текущий пароль</label>
-                            <input type="password" name="old_password" id="settings_old_password" placeholder="Введите текущий пароль">
+                            {% include "partials/password_input.html" with pw_id="settings_old_password" pw_name="old_password" pw_placeholder="Введите текущий пароль" pw_autocomplete="current-password" %}
                             {% if password_form.old_password.errors %}
                                 <span class="register-field-error">{{ password_form.old_password.errors.0 }}</span>
                             {% endif %}
                         </div>
                         <div class="register-input-group">
                             <label for="settings_new_password1">Новый пароль</label>
-                            <input type="password" name="new_password1" id="settings_new_password1" placeholder="Введите новый пароль">
+                            {% include "partials/password_input.html" with pw_id="settings_new_password1" pw_name="new_password1" pw_placeholder="Введите новый пароль" pw_autocomplete="new-password" %}
                             {% if password_form.new_password1.errors %}
                                 <span class="register-field-error">{{ password_form.new_password1.errors.0 }}</span>
                             {% endif %}
                         </div>
                         <div class="register-input-group">
                             <label for="settings_new_password2">Подтвердите новый пароль</label>
-                            <input type="password" name="new_password2" id="settings_new_password2" placeholder="Повторите новый пароль">
+                            {% include "partials/password_input.html" with pw_id="settings_new_password2" pw_name="new_password2" pw_placeholder="Повторите новый пароль" pw_autocomplete="new-password" %}
                             {% if password_form.new_password2.errors %}
                                 <span class="register-field-error">{{ password_form.new_password2.errors.0 }}</span>
                             {% endif %}
@@ -81,5 +81,6 @@
             <a href="/">Вернуться на главную</a>
         </div>
     </footer>
+    <script src="{% static 'js/password-toggle.js' %}"></script>
 </body>
 </html>

@@ -30,7 +30,7 @@
                         </div>
                         <div class="register-input-group">
                             <label for="login_password">Пароль</label>
-                            <input type="password" name="password" id="login_password" placeholder="Введите пароль">
+                            {% include "partials/password_input.html" with pw_id="login_password" pw_name="password" pw_placeholder="Введите пароль" pw_autocomplete="current-password" %}
                         </div>
                         <button class="register-submit" type="submit">Войти</button>
                     </form>
@@ -48,5 +48,6 @@
             <a href="/register/">Создать аккаунт</a>
         </div>
     </footer>
+    <script src="{% static 'js/password-toggle.js' %}"></script>
 </body>
 </html>

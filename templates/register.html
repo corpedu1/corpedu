@@ -41,11 +41,11 @@
                         </div>
                         <div class="register-input-group">
                             <label for="register_password">Пароль</label>
-                            <input type="password" name="password" id="register_password" placeholder="Введите пароль">
+                            {% include "partials/password_input.html" with pw_id="register_password" pw_name="password" pw_placeholder="Введите пароль" pw_autocomplete="new-password" %}
                         </div>
                         <div class="register-input-group">
                             <label for="register_password_repeat">Подтвердить пароль</label>
-                            <input type="password" name="password_repeat" id="register_password_repeat" placeholder="Повторите пароль">
+                            {% include "partials/password_input.html" with pw_id="register_password_repeat" pw_name="password_repeat" pw_placeholder="Повторите пароль" pw_autocomplete="new-password" %}
                         </div>
                         <button class="register-submit" type="submit">Зарегистрироваться</button>
                     </form>
@@ -63,5 +63,6 @@
             <a href="/login/">Перейти к авторизации</a>
         </div>
     </footer>
+    <script src="{% static 'js/password-toggle.js' %}"></script>
 </body>
 </html>
