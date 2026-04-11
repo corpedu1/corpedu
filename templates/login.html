@@ -17,6 +17,9 @@
                     <p class="register-title">Вход</p>
                     <form class="register-form" action="/login/" method="post">
                         {% csrf_token %}
+                        {% if next_url %}
+                            <input type="hidden" name="next" value="{{ next_url }}">
+                        {% endif %}
                         {% if form.non_field_errors %}
                             <div class="register-form-errors">
                                 {% for error in form.non_field_errors %}

@@ -27,10 +27,27 @@
                         <span>~{{ test.estimated_minutes }} мин</span>
                         <span>Проходной балл: {{ test.passing_score_percent }}%</span>
                     </div>
-                    <p style="margin-top: 1rem; color: #64748b; font-size: 0.95rem;">
-                        Интерактивное прохождение теста будет добавлено на платформе позднее.
-                    </p>
-                    <a class="material-card__details-button" href="{% url 'knowledge_tests' %}" style="margin-top: 1rem;">Ко всем тестам</a>
+
+                    {% if user.is_authenticated %}
+                        {% if test.question_count > 0 %}
+                            {% if last_attempt %}
+                                <p class="knowledge-test-detail-last" style="margin-top: 1rem;">
+                                    Последняя попытка: <strong>{{ last_attempt.score_percent }}%</strong>
+                                    {% if last_attempt.is_passed %}<span class="knowledge-test-detail-last__ok">(зачёт)</span>{% else %}<span class="knowledge-test-detail-last__no">(незачёт)</span>{% endif %}
+                                    — <a href="{% url 'knowledge_test_result' test.slug last_attempt.id %}">смотреть результат</a>
+                                </p>
+                            {% endif %}
+                            <a class="material-card__details-button" href="{% url 'knowledge_test_take_intro' test.slug %}" style="margin-top: 1rem;">Пройти тест</a>
+                        {% else %}
+                            <p style="margin-top: 1rem; color: #64748b; font-size: 0.95rem;">В тесте пока нет вопросов.</p>
+                        {% endif %}
+                    {% else %}
+                        <p style="margin-top: 1rem; color: #64748b; font-size: 0.95rem;">
+                            <a href="{% url 'login' %}?next={% url 'knowledge_test_take_intro' test.slug %}">Войдите</a>, чтобы пройти тест интерактивно.
+                        </p>
+                    {% endif %}
+
+                    <a class="knowledge-test-detail-back" href="{% url 'knowledge_tests' %}" style="margin-top: 1rem; display: inline-block;">Ко всем тестам</a>
                 </div>
             </div>
         </section>

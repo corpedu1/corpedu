@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результат: {{ test.title }} | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="materials-page knowledge-test-take-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker"><a href="{% url 'knowledge_tests' %}">Тесты</a></p>
+                <h1>Результат</h1>
+                <p class="section-subtitle">{{ test.title }}</p>
+
+                <div class="knowledge-test-result-summary {% if attempt.is_passed %}knowledge-test-result-summary--pass{% else %}knowledge-test-result-summary--fail{% endif %}">
+                    <p class="knowledge-test-result-summary__score">{{ attempt.score_percent }}%</p>
+                    {% if attempt.is_passed %}
+                        <p class="knowledge-test-result-summary__label">Тест пройден (проходной балл {{ test.passing_score_percent }}%)</p>
+                    {% else %}
+                        <p class="knowledge-test-result-summary__label">Тест не пройден (нужно не меньше {{ test.passing_score_percent }}%)</p>
+                    {% endif %}
+                </div>
+
+                <h2 class="knowledge-test-result-review-title">Разбор</h2>
+                <ol class="knowledge-test-result-list">
+                    {% for row in answer_rows %}
+                        <li class="knowledge-test-result-item {% if row.is_correct %}knowledge-test-result-item--ok{% else %}knowledge-test-result-item--bad{% endif %}">
+                            <p class="knowledge-test-result-item__q">{{ row.question.text }}</p>
+                            <p class="knowledge-test-result-item__a">Ваш ответ: {{ row.selected.text }}</p>
+                            {% if not row.is_correct %}
+                                <p class="knowledge-test-result-item__hint">Ответ неверный.{% if row.correct_text %} Верный вариант: {{ row.correct_text }}{% endif %}</p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ol>
+
+                <div class="knowledge-test-result-actions">
+                    <a class="material-card__details-button" href="{% url 'knowledge_test_take_intro' test.slug %}">Пройти ещё раз</a>
+                    <a class="knowledge-test-result-actions__secondary" href="{% url 'knowledge_tests' %}">Все тесты</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/">На главную</a>
+        </div>
+    </footer>
+</body>
+</html>

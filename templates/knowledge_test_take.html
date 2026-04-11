@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ test.title }} — вопросы | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="materials-page knowledge-test-take-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">{{ test.title }}</p>
+                <h1>Ответьте на вопросы</h1>
+                {% if error_message %}
+                    <div class="register-form-errors knowledge-test-take-error"><p>{{ error_message }}</p></div>
+                {% endif %}
+
+                <form method="post" action="{% url 'knowledge_test_take' test.slug attempt.id %}" class="knowledge-test-take-form">
+                    {% csrf_token %}
+                    {% for q in questions %}
+                        <fieldset class="knowledge-test-question-fieldset">
+                            <legend class="knowledge-test-question-fieldset__legend">{{ forloop.counter }}. {{ q.text }}</legend>
+                            <div class="knowledge-test-choices">
+                                {% for c in q.answer_choices.all %}
+                                    <label class="knowledge-test-choice">
+                                        <input type="radio" name="q_{{ q.id }}" value="{{ c.id }}" required>
+                                        <span class="knowledge-test-choice__text">{{ c.text }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+                    {% endfor %}
+                    <div class="knowledge-test-take-form__submit-wrap">
+                        <button type="submit" class="knowledge-test-intro-card__start">Отправить ответы</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="{% url 'knowledge_test_detail' test.slug %}">К описанию теста</a>
+        </div>
+    </footer>
+</body>
+</html>

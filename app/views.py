@@ -32,6 +32,8 @@ from .forms import (
 from .models import (
     KnowledgeTest,
     KnowledgeTestAnswerChoice,
+    KnowledgeTestAttempt,
+    KnowledgeTestAttemptAnswer,
     KnowledgeTestQuestion,
     LearningMaterial,
     MaterialCategory,
@@ -76,6 +78,18 @@ def _is_curator(user):
     Проверяет, что пользователь является куратором.
     """
     return user.is_authenticated and user.role == UserRole.CURATOR
+
+
+def _safe_redirect_path(url):
+    """
+    Разрешён только относительный путь на этом сайте (для ?next= после входа).
+    """
+    if not url or not isinstance(url, str):
+        return None
+    url = url.strip()
+    if not url.startswith("/") or url.startswith("//"):
+        return None
+    return url
 
 
 def _build_unique_material_slug(title, current_id=None):
@@ -219,7 +233,164 @@ def knowledge_test_detail(request, slug):
         .prefetch_related("questions__answer_choices"),
         slug=slug,
     )
-    return render(request, "knowledge_test_detail.html", {"test": test})
+    last_attempt = None
+    if request.user.is_authenticated:
+        last_attempt = (
+            KnowledgeTestAttempt.objects.filter(
+                user=request.user,
+                test_id=test.id,
+                completed_at__isnull=False,
+            )
+            .order_by("-completed_at")
+            .first()
+        )
+    return render(
+        request,
+        "knowledge_test_detail.html",
+        {"test": test, "last_attempt": last_attempt},
+    )
+
+
+@login_required
+def knowledge_test_take_intro(request, slug):
+    """
+    Инструкция перед попыткой; POST создаёт попытку и ведёт на форму вопросов.
+    """
+    test = get_object_or_404(
+        KnowledgeTest.objects.filter(is_published=True).annotate(question_count=Count("questions")),
+        slug=slug,
+    )
+    if test.question_count == 0:
+        return render(
+            request,
+            "knowledge_test_take_intro.html",
+            {"test": test, "cannot_start": True},
+        )
+    if request.method == "POST":
+        attempt = KnowledgeTestAttempt.objects.create(user=request.user, test=test)
+        return redirect("knowledge_test_take", slug=test.slug, attempt_id=attempt.pk)
+    return render(request, "knowledge_test_take_intro.html", {"test": test, "cannot_start": False})
+
+
+@login_required
+def knowledge_test_take(request, slug, attempt_id):
+    """
+    Интерактивное прохождение: форма с вопросами и вариантами, POST — подсчёт результата.
+    """
+    test = get_object_or_404(KnowledgeTest.objects.filter(is_published=True), slug=slug)
+    attempt = get_object_or_404(
+        KnowledgeTestAttempt.objects.select_related("test"),
+        pk=attempt_id,
+        user_id=request.user.id,
+        test_id=test.id,
+    )
+    if attempt.completed_at is not None:
+        return redirect("knowledge_test_result", slug=slug, attempt_id=attempt.pk)
+
+    questions = list(
+        KnowledgeTestQuestion.objects.filter(test_id=test.id)
+        .prefetch_related("answer_choices")
+        .order_by("order", "id")
+    )
+    if not questions:
+        return redirect("knowledge_test_take_intro", slug=slug)
+
+    if request.method == "POST":
+        error_message = ""
+        for q in questions:
+            if not request.POST.get(f"q_{q.id}"):
+                error_message = "Ответьте на все вопросы."
+                break
+        if error_message:
+            return render(
+                request,
+                "knowledge_test_take.html",
+                {
+                    "test": test,
+                    "attempt": attempt,
+                    "questions": questions,
+                    "error_message": error_message,
+                },
+            )
+
+        with transaction.atomic():
+            KnowledgeTestAttemptAnswer.objects.filter(attempt_id=attempt.id).delete()
+            correct = 0
+            for q in questions:
+                raw = request.POST.get(f"q_{q.id}")
+                try:
+                    cid = int(raw)
+                except (TypeError, ValueError):
+                    return HttpResponseBadRequest("bad choice")
+                choice = KnowledgeTestAnswerChoice.objects.filter(pk=cid, question_id=q.id).first()
+                if choice is None:
+                    return HttpResponseBadRequest("choice")
+                KnowledgeTestAttemptAnswer.objects.create(
+                    attempt=attempt,
+                    question=q,
+                    selected_choice=choice,
+                )
+                if choice.is_correct:
+                    correct += 1
+            total = len(questions)
+            score = round(100 * correct / total) if total else 0
+            passed = score >= test.passing_score_percent
+            attempt.completed_at = timezone.now()
+            attempt.score_percent = score
+            attempt.is_passed = passed
+            attempt.save(update_fields=["completed_at", "score_percent", "is_passed"])
+
+        return redirect("knowledge_test_result", slug=slug, attempt_id=attempt.pk)
+
+    return render(
+        request,
+        "knowledge_test_take.html",
+        {"test": test, "attempt": attempt, "questions": questions},
+    )
+
+
+@login_required
+def knowledge_test_result(request, slug, attempt_id):
+    """
+    Результат попытки: балл, зачёт/незачёт, разбор ответов.
+    """
+    test = get_object_or_404(KnowledgeTest.objects.filter(is_published=True), slug=slug)
+    attempt = get_object_or_404(
+        KnowledgeTestAttempt.objects.select_related("test"),
+        pk=attempt_id,
+        user_id=request.user.id,
+        test_id=test.id,
+    )
+    if attempt.completed_at is None:
+        return redirect("knowledge_test_take", slug=slug, attempt_id=attempt.pk)
+
+    answer_rows = []
+    ordered = attempt.answers.select_related("question", "selected_choice").order_by("question__order", "question_id")
+    q_ids = [a.question_id for a in ordered]
+    correct_by_q = {}
+    if q_ids:
+        for c in KnowledgeTestAnswerChoice.objects.filter(question_id__in=q_ids, is_correct=True):
+            correct_by_q[c.question_id] = c.text
+
+    for ans in ordered:
+        qid = ans.question_id
+        row = {
+            "question": ans.question,
+            "selected": ans.selected_choice,
+            "is_correct": ans.selected_choice.is_correct,
+            "correct_text": correct_by_q.get(qid, "") if not ans.selected_choice.is_correct else "",
+        }
+        answer_rows.append(row)
+
+    return render(
+        request,
+        "knowledge_test_result.html",
+        {
+            "test": test,
+            "attempt": attempt,
+            "answer_rows": answer_rows,
+        },
+    )
 
 
 def material_detail(request, slug):
@@ -347,15 +518,18 @@ def login(request):
     Отображает и обрабатывает страницу «Вход».
     """
     if request.user.is_authenticated:
-        return redirect("landing")
+        safe = _safe_redirect_path(request.GET.get("next"))
+        return redirect(safe) if safe else redirect("landing")
+    next_url = request.GET.get("next", "")
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
             auth_login(request, form.cleaned_data["user"])
-            return redirect("landing")
+            safe = _safe_redirect_path(request.POST.get("next"))
+            return redirect(safe) if safe else redirect("landing")
     else:
         form = LoginForm()
-    return render(request, "login.html", {"form": form})
+    return render(request, "login.html", {"form": form, "next_url": next_url})
 
 
 def logout(request):

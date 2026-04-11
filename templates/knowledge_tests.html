@@ -33,7 +33,12 @@
                                     <span>Автор: {{ item.author.username }}</span>
                                     <span>~{{ item.estimated_minutes }} мин</span>
                                 </div>
-                                <a class="material-card__details-button" href="{% url 'knowledge_test_detail' item.slug %}">Подробнее</a>
+                                <div class="material-card__actions">
+                                    <a class="material-card__details-button" href="{% url 'knowledge_test_detail' item.slug %}">Подробнее</a>
+                                    {% if user.is_authenticated and item.question_count > 0 %}
+                                        <a class="material-card__details-button material-card__details-button--accent" href="{% url 'knowledge_test_take_intro' item.slug %}">Пройти тест</a>
+                                    {% endif %}
+                                </div>
                             </article>
                         {% endfor %}
                     </div>
