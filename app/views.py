@@ -205,7 +205,7 @@ def feedback(request):
             submission.save()
             messages.success(
                 request,
-                "Сообщение отправлено. Мы свяжемся с вами при необходимости.",
+                "Сообщение отправлено. С Вами свяжутся в ближайшее время.",
             )
             return redirect("feedback")
     else:

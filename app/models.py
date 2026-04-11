@@ -471,7 +471,6 @@ class FeedbackSubmissionStatus(models.TextChoices):
 
     NEW = "new", "Новая"
     IN_PROGRESS = "in_progress", "В работе"
-    RESOLVED = "resolved", "Выполнено"
     CLOSED = "closed", "Закрыто"
 
 
