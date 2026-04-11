@@ -286,3 +286,179 @@ class UserMaterialPageQuizCompletion(models.Model):
 
     def __str__(self):
         return f"{self.user_id} · page {self.page_id} · {self.selected_choice}"
+
+
+# ---------------------------------------------------------------------------
+# Платформенные тесты (отдельная сущность, не путать с мини-тестами на страницах
+# материалов — см. MaterialPage.quiz_* и UserMaterialPageQuizCompletion).
+# ---------------------------------------------------------------------------
+
+
+class KnowledgeTest(models.Model):
+    """
+    Проверочный тест на платформе: отдельная страница / раздел, как учебные материалы.
+    """
+
+    title = models.CharField(max_length=255, verbose_name="Заголовок")
+    slug = models.SlugField(max_length=280, unique=True, verbose_name="Слаг")
+    summary = models.TextField(blank=True, verbose_name="Краткое описание")
+    category = models.ForeignKey(
+        MaterialCategory,
+        on_delete=models.PROTECT,
+        related_name="knowledge_tests",
+        verbose_name="Категория",
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        related_name="authored_knowledge_tests",
+        verbose_name="Автор",
+    )
+    estimated_minutes = models.PositiveIntegerField(
+        default=15,
+        verbose_name="Оценка времени, мин",
+    )
+    passing_score_percent = models.PositiveSmallIntegerField(
+        default=60,
+        verbose_name="Проходной балл, %",
+        help_text="Минимальный процент верных ответов для успешного прохождения.",
+    )
+    is_published = models.BooleanField(default=False, verbose_name="Опубликован")
+    published_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата публикации")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+
+    class Meta:
+        verbose_name = "Тест"
+        verbose_name_plural = "Тесты"
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return self.title
+
+
+class KnowledgeTestQuestion(models.Model):
+    """
+    Вопрос внутри платформенного теста (один верный вариант среди предложенных).
+    """
+
+    test = models.ForeignKey(
+        KnowledgeTest,
+        on_delete=models.CASCADE,
+        related_name="questions",
+        verbose_name="Тест",
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    text = models.TextField(verbose_name="Текст вопроса")
+
+    class Meta:
+        verbose_name = "Вопрос теста"
+        verbose_name_plural = "Вопросы теста"
+        ordering = ("order", "id")
+
+    def __str__(self):
+        return f"{self.test_id} · {self.order}"
+
+
+class KnowledgeTestAnswerChoice(models.Model):
+    """
+    Вариант ответа на вопрос платформенного теста.
+    """
+
+    question = models.ForeignKey(
+        KnowledgeTestQuestion,
+        on_delete=models.CASCADE,
+        related_name="answer_choices",
+        verbose_name="Вопрос",
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    text = models.TextField(verbose_name="Текст варианта")
+    is_correct = models.BooleanField(default=False, verbose_name="Верный ответ")
+
+    class Meta:
+        verbose_name = "Вариант ответа (тест)"
+        verbose_name_plural = "Варианты ответа (тест)"
+        ordering = ("order", "id")
+
+    def __str__(self):
+        return f"Q{self.question_id} · {self.order}"
+
+
+class KnowledgeTestAttempt(models.Model):
+    """
+    Попытка прохождения платформенного теста пользователем.
+    """
+
+    user = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        related_name="knowledge_test_attempts",
+        verbose_name="Пользователь",
+    )
+    test = models.ForeignKey(
+        KnowledgeTest,
+        on_delete=models.CASCADE,
+        related_name="attempts",
+        verbose_name="Тест",
+    )
+    started_at = models.DateTimeField(auto_now_add=True, verbose_name="Начато")
+    completed_at = models.DateTimeField(null=True, blank=True, verbose_name="Завершено")
+    score_percent = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Результат, %",
+    )
+    is_passed = models.BooleanField(null=True, blank=True, verbose_name="Пройден")
+
+    class Meta:
+        verbose_name = "Попытка теста"
+        verbose_name_plural = "Попытки тестов"
+        ordering = ("-started_at",)
+
+    def __str__(self):
+        return f"{self.user_id} · test {self.test_id} · {self.started_at}"
+
+
+class KnowledgeTestAttemptAnswer(models.Model):
+    """
+    Выбранный пользователем вариант на вопрос в рамках попытки.
+    """
+
+    attempt = models.ForeignKey(
+        KnowledgeTestAttempt,
+        on_delete=models.CASCADE,
+        related_name="answers",
+        verbose_name="Попытка",
+    )
+    question = models.ForeignKey(
+        KnowledgeTestQuestion,
+        on_delete=models.CASCADE,
+        related_name="attempt_answers",
+        verbose_name="Вопрос",
+    )
+    selected_choice = models.ForeignKey(
+        KnowledgeTestAnswerChoice,
+        on_delete=models.CASCADE,
+        related_name="attempt_selections",
+        verbose_name="Выбранный вариант",
+    )
+
+    class Meta:
+        verbose_name = "Ответ в попытке теста"
+        verbose_name_plural = "Ответы в попытках тестов"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("attempt", "question"),
+                name="uniq_knowledge_test_attempt_question",
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.selected_choice_id and self.question_id and self.selected_choice.question_id != self.question_id:
+            raise ValidationError(
+                {"selected_choice": "Выбранный вариант не относится к этому вопросу."}
+            )
+
+    def __str__(self):
+        return f"attempt {self.attempt_id} · Q{self.question_id}"
