@@ -32,6 +32,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
+    path('cabinet/', views.cabinet, name='cabinet'),
     path('settings/', views.settings, name='settings'),
     path('admin-panel/', views.admin_panel, name='admin_panel'),
     path('admin-panel/user-roles/', views.admin_user_roles, name='admin_user_roles'),

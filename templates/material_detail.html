@@ -83,7 +83,7 @@
                                 {% endif %}
                                 <div class="quiz-message-box{% if current_page_quiz_completion %} quiz-message-box--success{% endif %}" data-quiz-feedback {% if not current_page_quiz_completion %}hidden{% endif %} role="status" aria-live="polite">
                                     <span class="quiz-message-box__icon" aria-hidden="true">{% if current_page_quiz_completion %}✓{% endif %}</span>
-                                    <p class="quiz-message-box__text">{% if current_page_quiz_completion %}Верно! Ответ сохранён — выбран правильный вариант.{% endif %}</p>
+                                    <p class="quiz-message-box__text">{% if current_page_quiz_completion %}Верно! Выбран правильный вариант.{% endif %}</p>
                                 </div>
                             </div>
                         {% endif %}
@@ -176,7 +176,7 @@
                     if (!res.ok) throw new Error();
                     return res.json();
                 }).then(function (data) {
-                    showQuizMessage("success", "Верно! Ответ сохранён — выбран правильный вариант.");
+                    showQuizMessage("success", "Верно! Выбран правильный вариант.");
                     root.classList.add("material-page-quiz--solved");
                     root.querySelectorAll(".material-page-quiz__input").forEach(function (inp) {
                         inp.disabled = true;
@@ -192,7 +192,7 @@
                         if (pct) pct.textContent = data.progress_percent + "%";
                     }
                 }).catch(function () {
-                    showQuizMessage("error", "Не удалось сохранить результат. Попробуйте ещё раз.");
+                    showQuizMessage("error", "Не удалось отправить результат. Попробуйте ещё раз.");
                 });
             });
         });

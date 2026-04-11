@@ -21,6 +21,7 @@
                     {% elif request.user.role == "curator" %}
                         <a class="topbar__user-menu-link" href="/curator-panel/">Панель управления</a>
                     {% endif %}
+                    <a class="topbar__user-menu-link" href="{% url 'cabinet' %}">Личный кабинет</a>
                     <a class="topbar__user-menu-link" href="/settings/">Настройки</a>
                 </div>
                 <form method="post" action="/logout/" class="topbar__logout-form">

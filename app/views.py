@@ -339,24 +339,39 @@ def settings(request):
                 update_session_auth_hash(request, user)
                 return redirect("settings")
             profile_form = ProfileForm(instance=request.user)
-    materials_for_progress = LearningMaterial.objects.filter(is_published=True).select_related("category").prefetch_related(
-        "pages"
-    )
-    material_progress_rows = [
-        {
-            "material": m,
-            "percent": _compute_material_progress_percent(request.user, m),
-        }
-        for m in materials_for_progress
-    ]
     return render(
         request,
         "settings.html",
         {
             "profile_form": profile_form,
             "password_form": password_form,
-            "material_progress_rows": material_progress_rows,
         },
+    )
+
+
+@login_required
+def cabinet(request):
+    """
+    Личный кабинет: прогресс только по материалам, которые пользователь открывал
+    (есть запись UserMaterialProgress; процент может быть 0%).
+    """
+    progress_records = (
+        UserMaterialProgress.objects.filter(user=request.user, material__is_published=True)
+        .select_related("material", "material__category")
+        .prefetch_related("material__pages")
+        .order_by("-updated_at")
+    )
+    material_progress_rows = [
+        {
+            "material": rec.material,
+            "percent": _compute_material_progress_percent(request.user, rec.material),
+        }
+        for rec in progress_records
+    ]
+    return render(
+        request,
+        "cabinet.html",
+        {"material_progress_rows": material_progress_rows},
     )
 
 
