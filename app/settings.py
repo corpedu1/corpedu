@@ -28,7 +28,8 @@ SECRET_KEY = "django-insecure-amhgee1z8kdl-g+z&evh(s(&(nyc-hj!#h((mp$240nn1wl642
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["corpedu-corpedu.amvera.io", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["https://corpedu-corpedu.amvera.io"]
 
 
 # Application definition
@@ -78,20 +79,31 @@ WSGI_APPLICATION = "app.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "corpedu",
+#         "USER": "root",
+#         "PASSWORD": "root",
+#         "HOST": "localhost",
+#         "PORT": "3306",
+#         "OPTIONS": {
+#             "charset": "utf8mb4",
+#         },
+#     }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "corpedu",
         "USER": "root",
         "PASSWORD": "root",
-        "HOST": "localhost",
+        "HOST": "amvera-corpedu-run-corpedu-db",
         "PORT": "3306",
-        "OPTIONS": {
-            "charset": "utf8mb4",
-        },
+        "OPTIONS": {"charset": "utf8mb4"},
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
