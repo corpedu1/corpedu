@@ -51,6 +51,39 @@
                     </table>
                 </article>
 
+                <article class="settings-card">
+                    <h2>Прогресс по тестам</h2>
+                    <table class="cabinet-progress-table">
+                        <thead>
+                            <tr>
+                                <th>Тест</th>
+                                <th>Лучший результат</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in test_progress_rows %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'knowledge_test_detail' row.test.slug %}">{{ row.test.title }}</a>
+                                    </td>
+                                    <td>
+                                        <div class="cabinet-progress-bar">
+                                            <div class="cabinet-progress-bar__track" role="img" aria-label="{{ row.percent }} процентов">
+                                                <span class="cabinet-progress-bar__fill" style="width: {{ row.percent }}%;"></span>
+                                            </div>
+                                            <span class="cabinet-progress-bar__pct">{{ row.percent }}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="2">Пока нет тестов с прогрессом — начните тест в разделе <a href="{% url 'knowledge_tests' %}">Тесты</a>.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </article>
+
                 <p class="cabinet-page__footer-note">
                     <a href="{% url 'settings' %}">Перейти в настройки профиля</a>
                 </p>

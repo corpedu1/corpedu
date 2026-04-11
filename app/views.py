@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Count, Max
+from django.db.models import Count, Max, Q
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -572,11 +572,45 @@ def settings(request):
     )
 
 
+def _knowledge_test_progress_rows_for_user(user):
+    """
+    Тесты, по которым у пользователя была хотя бы одна попытка (опубликованные).
+    Процент — лучший результат среди завершённых попыток; если нет завершённых — 0%.
+    Сортировка по времени последней активности (последний старт попытки).
+    """
+    stats = (
+        KnowledgeTestAttempt.objects.filter(user=user, test__is_published=True)
+        .values("test_id")
+        .annotate(
+            best_score=Max("score_percent", filter=Q(completed_at__isnull=False)),
+            last_at=Max("started_at"),
+        )
+    )
+    stats_list = sorted(stats, key=lambda s: s["last_at"], reverse=True)
+    test_ids = [s["test_id"] for s in stats_list]
+    if not test_ids:
+        return []
+    tests = {
+        t.id: t
+        for t in KnowledgeTest.objects.filter(id__in=test_ids).select_related("category")
+    }
+    rows = []
+    for s in stats_list:
+        tid = s["test_id"]
+        test = tests.get(tid)
+        if test is None:
+            continue
+        pct = s["best_score"]
+        if pct is None:
+            pct = 0
+        rows.append({"test": test, "percent": pct})
+    return rows
+
+
 @login_required
 def cabinet(request):
     """
-    Личный кабинет: прогресс только по материалам, которые пользователь открывал
-    (есть запись UserMaterialProgress; процент может быть 0%).
+    Личный кабинет: прогресс по материалам (UserMaterialProgress) и по тестам (попытки).
     """
     progress_records = (
         UserMaterialProgress.objects.filter(user=request.user, material__is_published=True)
@@ -591,10 +625,14 @@ def cabinet(request):
         }
         for rec in progress_records
     ]
+    test_progress_rows = _knowledge_test_progress_rows_for_user(request.user)
     return render(
         request,
         "cabinet.html",
-        {"material_progress_rows": material_progress_rows},
+        {
+            "material_progress_rows": material_progress_rows,
+            "test_progress_rows": test_progress_rows,
+        },
     )
 
 
