@@ -434,6 +434,25 @@ a {
     text-decoration: underline;
 }
 
+.advantages-page .advantages-cta .section-subtitle a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.advantages-page .advantages-cta .section-subtitle a:hover {
+    text-decoration: underline;
+}
+
+/* Меньше зазор между вводным блоком и «Организация» */
+.advantages-page .advantages-intro {
+    padding-bottom: 28px;
+}
+
+.advantages-page .advantages-intro + .section {
+    padding-top: 36px;
+}
+
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));

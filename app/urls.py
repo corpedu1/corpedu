@@ -23,6 +23,7 @@ from . import views
 urlpatterns = [
     path('', views.landing, name='landing'),
     path('about/', views.about, name='about'),
+    path('advantages/', views.advantages, name='advantages'),
     path('contacts/', views.contacts, name='contacts'),
     path('feedback/', views.feedback, name='feedback'),
     path('faq/', views.faq, name='faq'),

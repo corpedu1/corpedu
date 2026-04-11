@@ -276,6 +276,13 @@ def about(request):
     return render(request, "about.html")
 
 
+def advantages(request):
+    """
+    Отображает страницу «Преимущества».
+    """
+    return render(request, "advantages.html")
+
+
 def contacts(request):
     """
     Отображает страницу «Контакты».
@@ -311,17 +318,19 @@ def faq(request):
     return render(request, "faq.html")
 
 
+@login_required
 def materials(request):
     """
-    Отображает страницу списка обучающих материалов.
+    Отображает страницу списка обучающих материалов (только для авторизованных).
     """
     items = LearningMaterial.objects.filter(is_published=True).select_related("category", "author")
     return render(request, "materials.html", {"materials": items})
 
 
+@login_required
 def knowledge_tests(request):
     """
-    Список опубликованных платформенных тестов.
+    Список опубликованных платформенных тестов (только для авторизованных).
     """
     items = (
         KnowledgeTest.objects.filter(is_published=True)
@@ -331,9 +340,10 @@ def knowledge_tests(request):
     return render(request, "knowledge_tests.html", {"tests": items})
 
 
+@login_required
 def knowledge_test_detail(request, slug):
     """
-    Карточка теста (публично, только опубликованные).
+    Карточка теста; только опубликованные, доступ по авторизации.
     """
     test = get_object_or_404(
         KnowledgeTest.objects.filter(is_published=True)
@@ -502,9 +512,10 @@ def knowledge_test_result(request, slug, attempt_id):
     )
 
 
+@login_required
 def material_detail(request, slug):
     """
-    Отображает страницу детального просмотра обучающего материала.
+    Детальный просмотр обучающего материала (только для авторизованных).
     """
     material = get_object_or_404(
         LearningMaterial.objects.select_related("category", "author").prefetch_related("pages"),

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Преимущества | CyberLearn Витте</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="advantages-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section advantages-intro">
+            <div class="container">
+                <p class="section-kicker">Почему платформа</p>
+                <h1>Преимущества</h1>
+                <p class="section-subtitle">
+                    CyberLearn Витте объединяет обучение, контроль знаний и управление ролями в одном сервисе —
+                    чтобы снизить риски ИБ и упростить работу кураторов и руководителей.
+                </p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">Организация</p>
+                <h2>Что получает компания</h2>
+                <p class="section-subtitle">Практические эффекты от внедрения в рабочие процессы.</p>
+                <ol class="panel__list">
+                    <li>Единый стандарт обучения: все сотрудники проходят актуальные программы и единые тесты.</li>
+                    <li>Прозрачная аналитика: руководители видят прогресс и результаты по подразделениям.</li>
+                    <li>Снижение рисков: практические сценарии помогают предотвращать фишинг и утечки данных.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="section section--accent">
+            <div class="container">
+                <p class="section-kicker">Детали</p>
+                <h2>Ключевые возможности</h2>
+                <p class="section-subtitle">Инструменты, которые поддерживают регулярное обучение и контроль.</p>
+                <div class="security-grid">
+                    <div class="security-item">
+                        <h3>Учебные модули</h3>
+                        <p>Текстовые материалы, инструкции и методические блоки по темам информационной безопасности.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Проверка знаний</h3>
+                        <p>Тесты с разными уровнями сложности и фиксацией результатов попыток.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Ролевые кабинеты</h3>
+                        <p>Отдельный функционал для администратора, куратора и сотрудника.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Контроль динамики</h3>
+                        <p>Мониторинг прогресса, успеваемости и закрытия обязательных программ.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Безопасность сервиса</h3>
+                        <p>Разграничение доступа, защита сессий и ответственная работа с данными пользователей.</p>
+                    </div>
+                    <div class="security-item">
+                        <h3>Масштабирование</h3>
+                        <p>Один сервис для подразделений: единые правила обучения и отчётности по организации.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section advantages-cta">
+            <div class="container">
+                <p class="section-kicker">Дальше</p>
+                <h2>Узнать больше</h2>
+                <p class="section-subtitle">
+                    Ознакомьтесь с <a href="/about/">миссией платформы</a>, задайте вопрос через
+                    <a href="/feedback/">обратную связь</a> или откройте раздел <a href="/faq/">FAQ</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin/">Перейти к авторизации</a>
+        </div>
+    </footer>
+</body>
+</html>
