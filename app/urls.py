@@ -27,6 +27,7 @@ urlpatterns = [
     path('feedback/', views.feedback, name='feedback'),
     path('faq/', views.faq, name='faq'),
     path('materials/', views.materials, name='materials'),
+    path('materials/<slug:slug>/quiz-complete/', views.material_quiz_complete, name='material_quiz_complete'),
     path('materials/<slug:slug>/', views.material_detail, name='material_detail'),
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),

@@ -17,6 +17,16 @@
                     <p class="section-kicker">{{ material.category.name }}</p>
                     <h1>{{ material.title }}</h1>
 
+                    {% if user.is_authenticated and progress_percent is not None %}
+                        <p class="material-detail-progress-note" aria-label="Прогресс прохождения">
+                            <span class="material-detail-progress-note__label">Прогресс по материалу</span>
+                            <span class="material-detail-progress-note__bar" role="img" aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                <span class="material-detail-progress-note__fill" style="width: {{ progress_percent }}%;"></span>
+                            </span>
+                            <span class="material-detail-progress-note__pct">{{ progress_percent }}%</span>
+                        </p>
+                    {% endif %}
+
                     <div class="material-detail-meta" aria-label="Сведения о материале">
                         <span>Формат: {{ material.get_material_format_display }}</span>
                         <span>Автор: {{ material.author.username }}</span>
@@ -34,22 +44,6 @@
                 </header>
 
                 {% if total_pages %}
-                    <nav class="material-page-nav" aria-label="Страницы материала">
-                        <span class="material-page-nav__label">Страница {{ page_index }} из {{ total_pages }}</span>
-                        <div class="material-page-nav__links">
-                            {% if prev_page %}
-                                <a class="material-page-nav__btn" href="?page={{ prev_page }}">← Назад</a>
-                            {% else %}
-                                <span class="material-page-nav__btn material-page-nav__btn--disabled">← Назад</span>
-                            {% endif %}
-                            {% if next_page %}
-                                <a class="material-page-nav__btn" href="?page={{ next_page }}">Вперёд →</a>
-                            {% else %}
-                                <span class="material-page-nav__btn material-page-nav__btn--disabled">Вперёд →</span>
-                            {% endif %}
-                        </div>
-                    </nav>
-
                     <article class="material-detail-content material-detail-page-body">
                         {% if current_page.title %}
                             <h2 class="material-page-heading">{{ current_page.title }}</h2>
@@ -64,29 +58,52 @@
                         <div class="material-page-text">{{ current_page.body|linebreaksbr }}</div>
 
                         {% if current_page.has_quiz %}
-                            <div class="material-page-quiz" data-correct="{{ current_page.quiz_correct }}">
+                            <div class="material-page-quiz{% if current_page_quiz_completion %} material-page-quiz--solved{% endif %}"
+                                 data-correct="{{ current_page.quiz_correct }}"
+                                 data-page-id="{{ current_page.pk }}"
+                                 data-quiz-api="{% url 'material_quiz_complete' material.slug %}">
                                 <h3 class="material-page-quiz__title">Мини-тест</h3>
                                 <p class="material-page-quiz__q">{{ current_page.quiz_question|linebreaksbr }}</p>
                                 <ul class="material-page-quiz__choices">
                                     {% for num, text in current_page.quiz_choices_list %}
                                         {% if text %}
                                             <li>
-                                                <label class="material-page-quiz__label">
-                                                    <input type="radio" name="quiz-p{{ current_page.pk }}" value="{{ num }}" class="material-page-quiz__input">
+                                                <label class="material-page-quiz__label{% if current_page_quiz_completion %} material-page-quiz__label--locked{% endif %}">
+                                                    <input type="radio" name="quiz-p{{ current_page.pk }}" value="{{ num }}" class="material-page-quiz__input"
+                                                        {% if current_page_quiz_completion and current_page_quiz_completion.selected_choice == num %}checked{% endif %}
+                                                        {% if current_page_quiz_completion %}disabled{% endif %}>
                                                     <span>{{ num }}. {{ text }}</span>
                                                 </label>
                                             </li>
                                         {% endif %}
                                     {% endfor %}
                                 </ul>
-                                <button type="button" class="material-page-quiz__check">Проверить ответ</button>
-                                <div class="quiz-message-box" data-quiz-feedback hidden role="status" aria-live="polite">
-                                    <span class="quiz-message-box__icon" aria-hidden="true"></span>
-                                    <p class="quiz-message-box__text"></p>
+                                {% if not current_page_quiz_completion %}
+                                    <button type="button" class="material-page-quiz__check">Проверить ответ</button>
+                                {% endif %}
+                                <div class="quiz-message-box{% if current_page_quiz_completion %} quiz-message-box--success{% endif %}" data-quiz-feedback {% if not current_page_quiz_completion %}hidden{% endif %} role="status" aria-live="polite">
+                                    <span class="quiz-message-box__icon" aria-hidden="true">{% if current_page_quiz_completion %}✓{% endif %}</span>
+                                    <p class="quiz-message-box__text">{% if current_page_quiz_completion %}Верно! Ответ сохранён — выбран правильный вариант.{% endif %}</p>
                                 </div>
                             </div>
                         {% endif %}
                     </article>
+
+                    <nav class="material-page-nav material-page-nav--footer" aria-label="Страницы материала">
+                        <span class="material-page-nav__label">Страница {{ page_index }} из {{ total_pages }}</span>
+                        <div class="material-page-nav__links">
+                            {% if prev_page %}
+                                <a class="material-page-nav__btn" href="?page={{ prev_page }}">← Назад</a>
+                            {% else %}
+                                <span class="material-page-nav__btn material-page-nav__btn--disabled">← Назад</span>
+                            {% endif %}
+                            {% if next_page %}
+                                <a class="material-page-nav__btn" href="?page={{ next_page }}">Вперёд →</a>
+                            {% else %}
+                                <span class="material-page-nav__btn material-page-nav__btn--disabled">Вперёд →</span>
+                            {% endif %}
+                        </div>
+                    </nav>
                 {% elif material.content %}
                     <article class="material-detail-content material-detail-page-body">
                         <h2 class="material-page-heading">Содержание</h2>
@@ -107,39 +124,79 @@
             <a href="/materials/">Вернуться к списку материалов</a>
         </div>
     </footer>
+    {% csrf_token %}
     <script>
-    document.querySelectorAll(".material-page-quiz").forEach(function (root) {
-        var correct = parseInt(root.getAttribute("data-correct"), 10);
-        var feedback = root.querySelector("[data-quiz-feedback]");
-        var btn = root.querySelector(".material-page-quiz__check");
-        var inputs = root.querySelectorAll(".material-page-quiz__input");
-        if (!btn || !feedback || !inputs.length) return;
-        var iconEl = feedback.querySelector(".quiz-message-box__icon");
-        var textEl = feedback.querySelector(".quiz-message-box__text");
-        function showQuizMessage(kind, message) {
-            feedback.hidden = false;
-            feedback.className = "quiz-message-box quiz-message-box--" + kind;
-            if (textEl) textEl.textContent = message;
-            if (iconEl) {
-                if (kind === "success") iconEl.textContent = "✓";
-                else if (kind === "error") iconEl.textContent = "✗";
-                else iconEl.textContent = "!";
-            }
+    (function () {
+        function getCookie(name) {
+            var parts = ("; " + document.cookie).split("; " + name + "=");
+            if (parts.length === 2) return parts.pop().split(";").shift();
+            return "";
         }
-        btn.addEventListener("click", function () {
-            var sel = root.querySelector(".material-page-quiz__input:checked");
-            if (!sel) {
-                showQuizMessage("warning", "Выберите вариант ответа.");
-                return;
+        document.querySelectorAll(".material-page-quiz:not(.material-page-quiz--solved)").forEach(function (root) {
+            var correct = parseInt(root.getAttribute("data-correct"), 10);
+            var pageId = root.getAttribute("data-page-id");
+            var apiUrl = root.getAttribute("data-quiz-api");
+            var feedback = root.querySelector("[data-quiz-feedback]");
+            var btn = root.querySelector(".material-page-quiz__check");
+            var inputs = root.querySelectorAll(".material-page-quiz__input");
+            if (!btn || !feedback || !inputs.length || !apiUrl) return;
+            var iconEl = feedback.querySelector(".quiz-message-box__icon");
+            var textEl = feedback.querySelector(".quiz-message-box__text");
+            function showQuizMessage(kind, message) {
+                feedback.hidden = false;
+                feedback.className = "quiz-message-box quiz-message-box--" + kind;
+                if (textEl) textEl.textContent = message;
+                if (iconEl) {
+                    if (kind === "success") iconEl.textContent = "✓";
+                    else if (kind === "error") iconEl.textContent = "✗";
+                    else iconEl.textContent = "!";
+                }
             }
-            var v = parseInt(sel.value, 10);
-            if (v === correct) {
-                showQuizMessage("success", "Верно! Ответ выбран правильно.");
-            } else {
-                showQuizMessage("error", "Неверно. Попробуйте выбрать другой вариант.");
-            }
+            btn.addEventListener("click", function () {
+                var sel = root.querySelector(".material-page-quiz__input:checked");
+                if (!sel) {
+                    showQuizMessage("warning", "Выберите вариант ответа.");
+                    return;
+                }
+                var v = parseInt(sel.value, 10);
+                if (v !== correct) {
+                    showQuizMessage("error", "Неверно. Попробуйте выбрать другой вариант.");
+                    return;
+                }
+                var csrftoken = getCookie("csrftoken");
+                fetch(apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrftoken || ""
+                    },
+                    credentials: "same-origin",
+                    body: JSON.stringify({ page_id: parseInt(pageId, 10), choice: v })
+                }).then(function (res) {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                }).then(function (data) {
+                    showQuizMessage("success", "Верно! Ответ сохранён — выбран правильный вариант.");
+                    root.classList.add("material-page-quiz--solved");
+                    root.querySelectorAll(".material-page-quiz__input").forEach(function (inp) {
+                        inp.disabled = true;
+                    });
+                    root.querySelectorAll(".material-page-quiz__label").forEach(function (lbl) {
+                        lbl.classList.add("material-page-quiz__label--locked");
+                    });
+                    btn.style.display = "none";
+                    if (data.progress_percent != null) {
+                        var note = document.querySelector(".material-detail-progress-note__fill");
+                        var pct = document.querySelector(".material-detail-progress-note__pct");
+                        if (note) note.style.width = data.progress_percent + "%";
+                        if (pct) pct.textContent = data.progress_percent + "%";
+                    }
+                }).catch(function () {
+                    showQuizMessage("error", "Не удалось сохранить результат. Попробуйте ещё раз.");
+                });
+            });
         });
-    });
+    })();
     </script>
 </body>
 </html>

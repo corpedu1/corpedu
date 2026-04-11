@@ -223,3 +223,66 @@ class MaterialPage(models.Model):
             (3, self.quiz_choice_3 or ""),
             (4, self.quiz_choice_4 or ""),
         ]
+
+
+class UserMaterialProgress(models.Model):
+    """
+    Последняя открытая страница материала (для прогресса без тестов).
+    """
+
+    user = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        related_name="material_progress_records",
+        verbose_name="Пользователь",
+    )
+    material = models.ForeignKey(
+        LearningMaterial,
+        on_delete=models.CASCADE,
+        related_name="user_progress_records",
+        verbose_name="Материал",
+    )
+    last_page_index = models.PositiveIntegerField(default=1, verbose_name="Последняя страница")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлено")
+
+    class Meta:
+        verbose_name = "Прогресс по материалу"
+        verbose_name_plural = "Прогресс по материалам"
+        constraints = [
+            models.UniqueConstraint(fields=("user", "material"), name="uniq_user_material_progress"),
+        ]
+
+    def __str__(self):
+        return f"{self.user_id} · {self.material_id} · стр.{self.last_page_index}"
+
+
+class UserMaterialPageQuizCompletion(models.Model):
+    """
+    Успешно пройденный мини-тест на странице.
+    """
+
+    user = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        related_name="page_quiz_completions",
+        verbose_name="Пользователь",
+    )
+    page = models.ForeignKey(
+        MaterialPage,
+        on_delete=models.CASCADE,
+        related_name="quiz_completions",
+        verbose_name="Страница",
+        db_constraint=False,
+    )
+    selected_choice = models.PositiveSmallIntegerField(verbose_name="Выбранный верный вариант")
+    completed_at = models.DateTimeField(auto_now_add=True, verbose_name="Пройдено")
+
+    class Meta:
+        verbose_name = "Пройденный тест страницы"
+        verbose_name_plural = "Пройденные тесты страниц"
+        constraints = [
+            models.UniqueConstraint(fields=("user", "page"), name="uniq_user_page_quiz_completion"),
+        ]
+
+    def __str__(self):
+        return f"{self.user_id} · page {self.page_id} · {self.selected_choice}"

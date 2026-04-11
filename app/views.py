@@ -2,6 +2,8 @@
 Представления проекта.
 """
 
+import json
+
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
@@ -9,9 +11,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError
 from django.db.models.deletion import ProtectedError
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.text import slugify
+from django.views.decorators.http import require_POST
 
 from .forms import (
     CuratorMaterialForm,
@@ -21,7 +25,36 @@ from .forms import (
     ProfileForm,
     RegisterForm,
 )
-from .models import LearningMaterial, MaterialCategory, User, UserRole
+from .models import (
+    LearningMaterial,
+    MaterialCategory,
+    MaterialPage,
+    User,
+    UserMaterialPageQuizCompletion,
+    UserMaterialProgress,
+    UserRole,
+)
+
+
+def _compute_material_progress_percent(user, material):
+    """
+    Процент прохождения: по тестам, если они есть; иначе по последней странице.
+    """
+    pages = list(material.pages.all())
+    total_pages = len(pages)
+    quiz_pages = [p for p in pages if p.has_quiz]
+    if quiz_pages:
+        n = len(quiz_pages)
+        passed = UserMaterialPageQuizCompletion.objects.filter(
+            user=user, page_id__in=[p.id for p in quiz_pages]
+        ).count()
+        return round(100 * passed / n) if n else 0
+    if total_pages == 0:
+        return 0
+    prog = UserMaterialProgress.objects.filter(user=user, material=material).first()
+    last = prog.last_page_index if prog else 1
+    last = min(max(last, 1), total_pages)
+    return round(100 * last / total_pages)
 
 
 def _is_administrator(user):
@@ -169,6 +202,24 @@ def material_detail(request, slug):
         current_page = pages[page_index - 1]
     prev_page = page_index - 1 if page_index > 1 else None
     next_page = page_index + 1 if total_pages and page_index < total_pages else None
+
+    current_page_quiz_completion = None
+    if request.user.is_authenticated and current_page and current_page.has_quiz:
+        current_page_quiz_completion = UserMaterialPageQuizCompletion.objects.filter(
+            user=request.user, page_id=current_page.pk
+        ).first()
+
+    if request.user.is_authenticated and total_pages > 0 and page_index >= 1:
+        UserMaterialProgress.objects.update_or_create(
+            user=request.user,
+            material=material,
+            defaults={"last_page_index": page_index},
+        )
+
+    progress_percent = None
+    if request.user.is_authenticated:
+        progress_percent = _compute_material_progress_percent(request.user, material)
+
     return render(
         request,
         "material_detail.html",
@@ -180,8 +231,49 @@ def material_detail(request, slug):
             "total_pages": total_pages,
             "prev_page": prev_page,
             "next_page": next_page,
+            "current_page_quiz_completion": current_page_quiz_completion,
+            "progress_percent": progress_percent,
         },
     )
+
+
+@login_required
+@require_POST
+def material_quiz_complete(request, slug):
+    """
+    Сохраняет успешное прохождение мини-теста (только верный ответ).
+    """
+    material = get_object_or_404(LearningMaterial.objects.prefetch_related("pages"), slug=slug)
+    can_view_draft = request.user.role == UserRole.ADMINISTRATOR or material.author_id == request.user.id
+    if not material.is_published and not can_view_draft:
+        return HttpResponseBadRequest("forbidden")
+
+    try:
+        data = json.loads(request.body.decode())
+    except (json.JSONDecodeError, UnicodeDecodeError, AttributeError):
+        return HttpResponseBadRequest("json")
+
+    page_id = data.get("page_id")
+    choice = data.get("choice")
+    try:
+        page_id = int(page_id)
+        choice = int(choice)
+    except (TypeError, ValueError):
+        return HttpResponseBadRequest("bad id")
+
+    page = MaterialPage.objects.filter(pk=page_id, material_id=material.id).first()
+    if page is None or not page.has_quiz:
+        return HttpResponseBadRequest("page")
+    if choice != page.quiz_correct:
+        return JsonResponse({"ok": False, "error": "not_correct"}, status=400)
+
+    UserMaterialPageQuizCompletion.objects.update_or_create(
+        user=request.user,
+        page=page,
+        defaults={"selected_choice": choice},
+    )
+    pct = _compute_material_progress_percent(request.user, material)
+    return JsonResponse({"ok": True, "progress_percent": pct})
 
 
 def register(request):
@@ -247,10 +339,24 @@ def settings(request):
                 update_session_auth_hash(request, user)
                 return redirect("settings")
             profile_form = ProfileForm(instance=request.user)
+    materials_for_progress = LearningMaterial.objects.filter(is_published=True).select_related("category").prefetch_related(
+        "pages"
+    )
+    material_progress_rows = [
+        {
+            "material": m,
+            "percent": _compute_material_progress_percent(request.user, m),
+        }
+        for m in materials_for_progress
+    ]
     return render(
         request,
         "settings.html",
-        {"profile_form": profile_form, "password_form": password_form},
+        {
+            "profile_form": profile_form,
+            "password_form": password_form,
+            "material_progress_rows": material_progress_rows,
+        },
     )
 
 

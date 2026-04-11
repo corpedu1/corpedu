@@ -13,6 +13,36 @@
     <main class="register-main">
         <section class="section settings-page">
             <div class="container settings-page__container">
+                <article class="settings-card settings-card--full">
+                    <h2>Прогресс по материалам</h2>
+                    <p class="settings-progress-lead">Процент считается по пройденным тестам; если тестов нет — по последней открытой странице.</p>
+                    <table class="settings-progress-table">
+                        <thead>
+                            <tr>
+                                <th>Материал</th>
+                                <th>Прогресс</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in material_progress_rows %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'material_detail' row.material.slug %}">{{ row.material.title }}</a>
+                                    </td>
+                                    <td>
+                                        <div class="settings-progress-bar">
+                                            <div class="settings-progress-bar__track" role="img" aria-label="{{ row.percent }} процентов">
+                                                <span class="settings-progress-bar__fill" style="width: {{ row.percent }}%;"></span>
+                                            </div>
+                                            <span class="settings-progress-bar__pct">{{ row.percent }}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </article>
+
                 <article class="settings-card">
                     <h2>Изменение личных данных</h2>
                     <form action="/settings/" method="post" class="settings-form">
