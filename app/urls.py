@@ -44,6 +44,12 @@ urlpatterns = [
     path('admin-panel/', views.admin_panel, name='admin_panel'),
     path('admin-panel/user-roles/', views.admin_user_roles, name='admin_user_roles'),
     path('admin-panel/material-categories/', views.admin_material_categories, name='admin_material_categories'),
+    path('admin-panel/material-statistics/', views.admin_material_statistics, name='admin_material_statistics'),
+    path(
+        'admin-panel/material-statistics/export/',
+        views.admin_material_statistics_export,
+        name='admin_material_statistics_export',
+    ),
     path('admin-panel/feedback/', views.admin_feedback_submissions, name='admin_feedback_submissions'),
     path('admin-panel/feedback/<int:pk>/', views.admin_feedback_detail, name='admin_feedback_detail'),
     path('curator-panel/', views.curator_panel, name='curator_panel'),

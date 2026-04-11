@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика учебных материалов | Админ панель</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section admin-panel-page">
+            <div class="container">
+                <div class="admin-layout">
+                    {% include "partials/admin_navbar.html" %}
+                    <div class="admin-layout__content">
+                        <p class="section-kicker">Администрирование</p>
+                        <h1>Статистика учебных материалов</h1>
+                        <p class="section-subtitle">
+                            Количество пользователей, начавших прохождение материала (есть запись прогресса),
+                            и завершивших его на 100% — по тем же правилам, что и индикатор прогресса в материале
+                            (мини-тесты на страницах или последняя страница, если тестов нет).
+                        </p>
+
+                        <p class="admin-material-stats-actions">
+                            <a class="register-submit admin-save-button admin-material-stats-export" href="{% url 'admin_material_statistics_export' %}">
+                                Скачать Excel
+                            </a>
+                        </p>
+
+                        {% if rows %}
+                            <div class="admin-categories-table-wrap admin-material-stats-table-wrap">
+                                <table class="admin-categories-table admin-material-stats-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Название материала</th>
+                                            <th>Кол-во начавших</th>
+                                            <th>Кол-во завершивших на 100%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in rows %}
+                                            <tr>
+                                                <td>{{ row.title }}</td>
+                                                <td>{{ row.started_count }}</td>
+                                                <td>{{ row.completed_count }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="materials-empty">
+                                <p>Учебных материалов пока нет.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <p>Платформа корпоративного обучения по информационной безопасности</p>
+            <a href="/admin-panel/">Вернуться в админ панель</a>
+        </div>
+    </footer>
+</body>
+</html>

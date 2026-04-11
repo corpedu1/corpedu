@@ -3,6 +3,7 @@
 """
 
 import json
+from io import BytesIO
 
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
@@ -14,7 +15,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Count, Max, Q
 from django.db.models.deletion import ProtectedError
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import FileResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.text import slugify
@@ -68,6 +69,72 @@ def _compute_material_progress_percent(user, material):
     last = prog.last_page_index if prog else 1
     last = min(max(last, 1), total_pages)
     return round(100 * last / total_pages)
+
+
+def _learning_material_statistics_rows():
+    """
+    По каждому учебному материалу: сколько пользователей начали и сколько достигли 100%
+    (та же логика, что и _compute_material_progress_percent).
+    """
+    materials = LearningMaterial.objects.prefetch_related("pages").order_by("title")
+    rows = []
+    for material in materials:
+        pages = list(material.pages.all())
+        total_pages = len(pages)
+        quiz_pages = [p for p in pages if p.has_quiz]
+        started = UserMaterialProgress.objects.filter(material=material).count()
+        if total_pages == 0:
+            completed = 0
+        elif quiz_pages:
+            qids = [p.id for p in quiz_pages]
+            n = len(qids)
+            completed = (
+                UserMaterialPageQuizCompletion.objects.filter(page_id__in=qids)
+                .values("user_id")
+                .annotate(passed=Count("page_id", distinct=True))
+                .filter(passed=n)
+                .count()
+            )
+        else:
+            completed = UserMaterialProgress.objects.filter(
+                material=material, last_page_index__gte=total_pages
+            ).count()
+        rows.append(
+            {
+                "title": material.title,
+                "started_count": started,
+                "completed_count": completed,
+            }
+        )
+    return rows
+
+
+def _material_statistics_xlsx_file(rows):
+    """
+    Генерирует Excel (openpyxl) в памяти.
+    """
+    from openpyxl import Workbook
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Статистика"
+    ws.append(
+        [
+            "Название материала",
+            "Кол-во начавших",
+            "Кол-во завершивших на 100%",
+        ]
+    )
+    for row in rows:
+        ws.append([row["title"], row["started_count"], row["completed_count"]])
+    ws.column_dimensions["A"].width = 48
+    ws.column_dimensions["B"].width = 22
+    ws.column_dimensions["C"].width = 34
+
+    buffer = BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    return buffer
 
 
 def _is_administrator(user):
@@ -706,6 +773,37 @@ def admin_panel(request):
         "tests_count": KnowledgeTest.objects.count(),
     }
     return render(request, "admin_panel.html", context)
+
+
+@login_required
+def admin_material_statistics(request):
+    """
+    Статистика по учебным материалам (начавшие / завершившие на 100%).
+    """
+    if not _is_administrator(request.user):
+        return redirect("landing")
+    rows = _learning_material_statistics_rows()
+    return render(
+        request,
+        "admin_material_statistics.html",
+        {"rows": rows},
+    )
+
+
+@login_required
+def admin_material_statistics_export(request):
+    """
+    Скачивание статистики учебных материалов в Excel.
+    """
+    if not _is_administrator(request.user):
+        return redirect("landing")
+    rows = _learning_material_statistics_rows()
+    buffer = _material_statistics_xlsx_file(rows)
+    return FileResponse(
+        buffer,
+        as_attachment=True,
+        filename="statistika_uchebnyh_materialov.xlsx",
+    )
 
 
 @login_required

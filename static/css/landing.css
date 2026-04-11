@@ -2673,6 +2673,23 @@ a {
     color: #f0fdfa;
 }
 
+.admin-material-stats-actions {
+    margin: 4px 0 18px;
+}
+
+a.admin-material-stats-export {
+    display: inline-block;
+    width: auto;
+    max-width: 100%;
+    margin-top: 0;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.admin-material-stats-table-wrap {
+    margin-top: 4px;
+}
+
 .admin-delete-button {
     background: #7f1d1d;
     border: 1px solid #7f1d1d;
