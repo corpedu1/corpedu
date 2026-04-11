@@ -1051,7 +1051,34 @@ a {
 
 .material-detail-page h1 {
     color: #0f172a;
-    margin-bottom: 10px;
+    margin-bottom: 0;
+}
+
+/* Верхний блок материала: категория + название → теги → описание → файл */
+.material-detail-intro {
+    margin-bottom: 22px;
+}
+
+.material-detail-intro .section-kicker {
+    margin-bottom: 8px;
+}
+
+.material-detail-intro .material-detail-meta {
+    margin-top: 14px;
+}
+
+.material-detail-summary {
+    margin-top: 16px;
+    margin-bottom: 0;
+    font-size: 1.05rem;
+    color: #64748b;
+    line-height: 1.6;
+    max-width: 52rem;
+}
+
+.material-detail-intro .material-detail-attachment {
+    margin-top: 16px;
+    margin-bottom: 0;
 }
 
 .material-detail-attachment {
@@ -1061,7 +1088,7 @@ a {
     gap: 8px 14px;
     margin-top: 12px;
     margin-bottom: 14px;
-    padding: 8px 12px;
+    padding: 10px 14px;
     border-radius: 10px;
     border: 1px solid #bae6fd;
     background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
@@ -1085,15 +1112,6 @@ a {
     flex-shrink: 0;
 }
 
-.material-detail-attachment__name {
-    font-size: 0.88rem;
-    color: #0f172a;
-    font-weight: 500;
-    min-width: 0;
-    word-break: break-word;
-    flex: 1 1 140px;
-}
-
 .material-detail-attachment__cta {
     margin-left: auto;
     flex-shrink: 0;
@@ -1113,7 +1131,7 @@ a {
 }
 
 .material-detail-meta {
-    margin-top: 16px;
+    margin-top: 0;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -1130,18 +1148,39 @@ a {
 .material-detail-content {
     margin-top: 18px;
     border: 1px solid #dbe5ef;
-    border-radius: 12px;
+    border-radius: 14px;
     background: #ffffff;
-    padding: 16px;
-}
-
-.material-detail-content h3 {
-    margin-bottom: 10px;
+    padding: 22px 20px 24px;
 }
 
 .material-detail-content p {
-    color: #334155;
-    line-height: 1.7;
+    color: #475569;
+    line-height: 1.75;
+    font-size: 1.02rem;
+}
+
+/* Заголовок страницы внутри материала — заметно крупнее основного текста */
+.material-page-heading {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.2;
+    color: #0f172a;
+    margin: 0 0 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Основной текст страницы — уровень body, ниже по акценту чем заголовок */
+.material-detail-page-body .material-page-text {
+    font-size: 1.05rem;
+    color: #475569;
+    line-height: 1.85;
+    max-width: 50rem;
+}
+
+.material-detail-page-body .material-page-text:first-of-type {
+    margin-top: 2px;
 }
 
 .material-detail-content--empty p {
@@ -1203,8 +1242,9 @@ a {
 }
 
 .material-page-text {
-    color: #334155;
-    line-height: 1.75;
+    color: #475569;
+    line-height: 1.8;
+    font-size: 1.05rem;
 }
 
 .material-page-figure {
@@ -1219,21 +1259,27 @@ a {
 }
 
 .material-page-quiz {
-    margin-top: 22px;
-    padding-top: 18px;
-    border-top: 1px dashed #cbd5e1;
+    margin-top: 26px;
+    padding: 18px 16px 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 40%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .material-page-quiz__title {
-    margin: 0 0 8px;
-    font-size: 1rem;
+    margin: 0 0 12px;
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
     color: #0f172a;
 }
 
 .material-page-quiz__q {
-    margin: 0 0 12px;
-    color: #334155;
-    line-height: 1.6;
+    margin: 0 0 14px;
+    color: #475569;
+    line-height: 1.65;
+    font-size: 1rem;
 }
 
 .material-page-quiz__choices {
@@ -1273,22 +1319,76 @@ a {
     background: #0369a1;
 }
 
-.material-page-quiz__feedback {
-    margin: 10px 0 0;
+/* Результат мини-теста: message-box */
+.quiz-message-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid transparent;
     font-size: 0.92rem;
+    line-height: 1.45;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.quiz-message-box[hidden] {
+    display: none !important;
+}
+
+.quiz-message-box__icon {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.quiz-message-box__text {
+    margin: 0;
+    padding-top: 1px;
     font-weight: 600;
 }
 
-.material-page-quiz__feedback--ok {
-    color: #15803d;
+.quiz-message-box--success {
+    background: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 100%);
+    border-color: #86efac;
+    color: #14532d;
 }
 
-.material-page-quiz__feedback--bad {
-    color: #b91c1c;
+.quiz-message-box--success .quiz-message-box__icon {
+    background: #22c55e;
+    color: #ffffff;
 }
 
-.material-page-quiz__feedback--warn {
-    color: #b45309;
+.quiz-message-box--error {
+    background: linear-gradient(180deg, #fef2f2 0%, #fff1f2 100%);
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
+.quiz-message-box--error .quiz-message-box__icon {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.quiz-message-box--warning {
+    background: linear-gradient(180deg, #fffbeb 0%, #fff7ed 100%);
+    border-color: #fcd34d;
+    color: #92400e;
+}
+
+.quiz-message-box--warning .quiz-message-box__icon {
+    background: #f59e0b;
+    color: #ffffff;
+    font-weight: 900;
+    font-size: 0.95rem;
 }
 
 .material-pages-editor__heading {
