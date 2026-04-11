@@ -90,12 +90,15 @@
                                                     {% endfor %}
                                                 </ol>
                                             </div>
-                                            <form method="post" action="{% url 'curator_knowledge_test_edit' test.slug %}" class="knowledge-test-question-list__delete">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="action" value="delete_question">
-                                                <input type="hidden" name="question_id" value="{{ q.id }}">
-                                                <button type="submit" class="topbar__action-link">Удалить</button>
-                                            </form>
+                                            <div class="knowledge-test-question-list__actions">
+                                                <a class="knowledge-test-question-list__edit" href="{% url 'curator_knowledge_test_question_edit' test.slug q.id %}">Редактировать</a>
+                                                <form method="post" action="{% url 'curator_knowledge_test_edit' test.slug %}" class="knowledge-test-question-list__delete">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="delete_question">
+                                                    <input type="hidden" name="question_id" value="{{ q.id }}">
+                                                    <button type="submit" class="knowledge-test-question-list__delete-btn">Удалить</button>
+                                                </form>
+                                            </div>
                                         </li>
                                     {% endfor %}
                                 </ul>

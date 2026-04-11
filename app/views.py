@@ -1020,3 +1020,65 @@ def curator_knowledge_test_edit(request, slug):
             "success_message": success_message,
         },
     )
+
+
+@login_required
+def curator_knowledge_test_question_edit(request, slug, question_id):
+    """
+    Редактирование одного вопроса теста и четырёх вариантов ответа.
+    """
+    if not _is_curator(request.user):
+        return redirect("landing")
+    test = get_object_or_404(KnowledgeTest, slug=slug, author=request.user)
+    question = get_object_or_404(KnowledgeTestQuestion, pk=question_id, test_id=test.id)
+    error_message = ""
+
+    def _initial_from_question():
+        ch_list = list(question.answer_choices.order_by("order", "id"))
+        initial = {"text": question.text}
+        for i in range(1, 5):
+            initial[f"choice_{i}"] = ch_list[i - 1].text if len(ch_list) >= i else ""
+        correct_idx = next((j + 1 for j, c in enumerate(ch_list) if c.is_correct), 1)
+        initial["correct_choice"] = correct_idx if ch_list else 1
+        return initial
+
+    if request.method == "POST":
+        form = KnowledgeTestQuestionEntryForm(request.POST)
+        if form.is_valid():
+            texts = [form.cleaned_data[f"choice_{i}"] for i in range(1, 5)]
+            cc = form.cleaned_data["correct_choice"]
+            with transaction.atomic():
+                question.text = form.cleaned_data["text"].strip()
+                question.save(update_fields=["text"])
+                ch_list = list(question.answer_choices.order_by("order", "id"))
+                if len(ch_list) == 4:
+                    for i, ch in enumerate(ch_list):
+                        idx = i + 1
+                        ch.text = texts[i]
+                        ch.is_correct = idx == cc
+                        ch.order = idx
+                        ch.save(update_fields=["text", "is_correct", "order"])
+                else:
+                    question.answer_choices.all().delete()
+                    for i in range(1, 5):
+                        KnowledgeTestAnswerChoice.objects.create(
+                            question=question,
+                            order=i,
+                            text=texts[i - 1],
+                            is_correct=(i == cc),
+                        )
+            return redirect("curator_knowledge_test_edit", slug=test.slug)
+        error_message = "Проверьте поля вопроса и вариантов."
+    else:
+        form = KnowledgeTestQuestionEntryForm(initial=_initial_from_question())
+
+    return render(
+        request,
+        "curator_knowledge_test_question_edit.html",
+        {
+            "test": test,
+            "question": question,
+            "form": form,
+            "error_message": error_message,
+        },
+    )
