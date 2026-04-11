@@ -254,8 +254,6 @@
         syncPublishAccordion();
     })();
     </script>
-
-    {% url 'curator_knowledge_tests_manage' as footer_curator_tests_manage_url %}
-    {% include "partials/footer.html" with footer_extra_href=footer_curator_tests_manage_url footer_extra_text="К списку тестов" %}
+    {% include "partials/footer.html" %}
 </body>
 </html>

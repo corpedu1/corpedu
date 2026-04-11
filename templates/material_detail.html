@@ -119,8 +119,8 @@
         </section>
     </main>
 
-    {% include "partials/footer.html" with footer_extra_href="/materials/" footer_extra_text="Вернуться к списку материалов" %}
-    {% csrf_token %}
+    {% include "partials/footer.html" %}
+{% csrf_token %}
     <script>
     (function () {
         function getCookie(name) {

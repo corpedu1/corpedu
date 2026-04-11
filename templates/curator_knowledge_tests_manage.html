@@ -70,8 +70,6 @@
             </div>
         </section>
     </main>
-
-    {% url 'curator_panel' as footer_curator_panel_url %}
-    {% include "partials/footer.html" with footer_extra_href=footer_curator_panel_url footer_extra_text="Вернуться в панель куратора" %}
+    {% include "partials/footer.html" %}
 </body>
 </html>

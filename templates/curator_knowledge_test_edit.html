@@ -143,8 +143,6 @@
             </div>
         </section>
     </main>
-
-    {% url 'knowledge_tests' as footer_knowledge_tests_url %}
-    {% include "partials/footer.html" with footer_extra_href=footer_knowledge_tests_url footer_extra_text="Публичный список тестов" %}
+    {% include "partials/footer.html" %}
 </body>
 </html>
