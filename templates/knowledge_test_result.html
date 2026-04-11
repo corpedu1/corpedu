@@ -47,11 +47,6 @@
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="container footer__content">
-            <p>Платформа корпоративного обучения по информационной безопасности</p>
-            <a href="/">На главную</a>
-        </div>
-    </footer>
+    {% include "partials/footer.html" with footer_extra_href="/" footer_extra_text="На главную" %}
 </body>
 </html>

@@ -224,11 +224,6 @@
     })();
     </script>
 
-    <footer class="footer">
-        <div class="container footer__content">
-            <p>Платформа корпоративного обучения по информационной безопасности</p>
-            <a href="/curator-panel/">Вернуться в панель куратора</a>
-        </div>
-    </footer>
+    {% include "partials/footer.html" with footer_extra_href="/curator-panel/" footer_extra_text="Вернуться в панель куратора" %}
 </body>
 </html>

@@ -42,11 +42,7 @@
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="container footer__content">
-            <p>Платформа корпоративного обучения по информационной безопасности</p>
-            <a href="{% url 'knowledge_test_detail' test.slug %}">К описанию теста</a>
-        </div>
-    </footer>
+    {% url 'knowledge_test_detail' test.slug as footer_test_detail_url %}
+    {% include "partials/footer.html" with footer_extra_href=footer_test_detail_url footer_extra_text="К описанию теста" %}
 </body>
 </html>

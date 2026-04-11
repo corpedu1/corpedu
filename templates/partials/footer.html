@@ -1,0 +1,48 @@
+<footer class="footer">
+    <div class="container footer__main">
+        <div class="footer__col footer__col--brand">
+            <a class="footer__logo" href="/">CyberLearn Витте</a>
+            <p class="footer__tagline">Платформа корпоративного обучения по информационной безопасности</p>
+        </div>
+        <div class="footer__col">
+            <p class="footer__heading">О платформе</p>
+            <nav class="footer__links" aria-label="О платформе">
+                <a href="/about/">О нас</a>
+                <a href="{% url 'advantages' %}">Преимущества</a>
+                <a href="{% url 'organizations' %}">Для организаций</a>
+                <a href="{% url 'security' %}">Безопасность</a>
+            </nav>
+        </div>
+        <div class="footer__col">
+            <p class="footer__heading">Сервис</p>
+            <nav class="footer__links" aria-label="Сервис">
+                <a href="/materials/">Материалы</a>
+                <a href="{% url 'knowledge_tests' %}">Тесты</a>
+                <a href="/faq/">FAQ</a>
+            </nav>
+        </div>
+        <div class="footer__col">
+            <p class="footer__heading">Контакты</p>
+            <div class="footer__contacts">
+                <span class="footer__contact-line">+7 (495) 123-45-67</span>
+                <span class="footer__contact-line">info@cyberlearn-vitte.ru</span>
+            </div>
+            <nav class="footer__links footer__links--spaced" aria-label="Связь">
+                <a href="/contacts/">Все контакты</a>
+                <a href="/feedback/">Обратная связь</a>
+            </nav>
+        </div>
+    </div>
+    {% if footer_extra_href and footer_extra_text %}
+        <div class="container footer__context">
+            <a href="{{ footer_extra_href }}">{{ footer_extra_text }}</a>
+        </div>
+    {% endif %}
+    <div class="container footer__bottom">
+        <div class="footer__bottom-links">
+            <a href="/login/">Вход</a>
+            <a href="/register/">Регистрация</a>
+        </div>
+        <p class="footer__copy">© {% now "Y" %} CyberLearn Витте</p>
+    </div>
+</footer>

@@ -49,12 +49,7 @@
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="container footer__content">
-            <p>Платформа корпоративного обучения по информационной безопасности</p>
-            <a href="/register/">Создать аккаунт</a>
-        </div>
-    </footer>
+    {% include "partials/footer.html" with footer_extra_href="/register/" footer_extra_text="Создать аккаунт" %}
     <script src="{% static 'js/password-toggle.js' %}"></script>
 </body>
 </html>

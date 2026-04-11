@@ -70,11 +70,7 @@
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="container footer__content">
-            <p>Платформа корпоративного обучения по информационной безопасности</p>
-            <a href="{% url 'curator_panel' %}">Вернуться в панель куратора</a>
-        </div>
-    </footer>
+    {% url 'curator_panel' as footer_curator_panel_url %}
+    {% include "partials/footer.html" with footer_extra_href=footer_curator_panel_url footer_extra_text="Вернуться в панель куратора" %}
 </body>
 </html>

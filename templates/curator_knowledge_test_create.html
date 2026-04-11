@@ -254,11 +254,7 @@
     })();
     </script>
 
-    <footer class="footer">
-        <div class="container footer__content">
-            <p>Платформа корпоративного обучения по информационной безопасности</p>
-            <a href="{% url 'curator_knowledge_tests_manage' %}">К списку тестов</a>
-        </div>
-    </footer>
+    {% url 'curator_knowledge_tests_manage' as footer_curator_tests_manage_url %}
+    {% include "partials/footer.html" with footer_extra_href=footer_curator_tests_manage_url footer_extra_text="К списку тестов" %}
 </body>
 </html>

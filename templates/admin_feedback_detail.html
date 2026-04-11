@@ -79,11 +79,6 @@
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="container footer__content">
-            <p>Платформа корпоративного обучения по информационной безопасности</p>
-            <a href="/admin-panel/feedback/">К списку обращений</a>
-        </div>
-    </footer>
+    {% include "partials/footer.html" with footer_extra_href="/admin-panel/feedback/" footer_extra_text="К списку обращений" %}
 </body>
 </html>
