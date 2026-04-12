@@ -452,7 +452,7 @@ def feedback(request):
     Страница «Обратная связь»: сохранение обращений в БД для администраторов.
     """
     if request.method == "POST":
-        form = PublicFeedbackForm(request.POST)
+        form = PublicFeedbackForm(request.POST, request.FILES)
         if form.is_valid():
             submission = form.save(commit=False)
             if request.user.is_authenticated:

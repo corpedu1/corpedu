@@ -26,7 +26,7 @@
                     {% endfor %}
                 {% endif %}
 
-                <form class="feedback-form" method="post" action="{% url 'feedback' %}">
+                <form class="feedback-form" method="post" action="{% url 'feedback' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     {% if form.non_field_errors %}
                         <div class="register-form-errors feedback-form-errors">
@@ -36,7 +36,7 @@
 
                     <div class="feedback-form__grid">
                         {% for field in form %}
-                            {% if field.name != 'message' %}
+                            {% if field.name != 'message' and field.name != 'attachment' %}
                                 <div class="feedback-field">
                                     {{ field.label_tag }}
                                     {{ field }}
@@ -53,6 +53,15 @@
                         {{ form.message }}
                         {% if form.message.errors %}
                             <ul class="feedback-field-errors">{% for err in form.message.errors %}<li>{{ err }}</li>{% endfor %}</ul>
+                        {% endif %}
+                    </div>
+
+                    <div class="feedback-field feedback-field--attachment">
+                        {{ form.attachment.label_tag }}
+                        <p class="feedback-field-hint">Необязательно. PDF, DOC, DOCX, изображения, TXT или ZIP, не более 5 МБ.</p>
+                        {{ form.attachment }}
+                        {% if form.attachment.errors %}
+                            <ul class="feedback-field-errors">{% for err in form.attachment.errors %}<li>{{ err }}</li>{% endfor %}</ul>
                         {% endif %}
                     </div>
 

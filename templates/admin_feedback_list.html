@@ -31,6 +31,7 @@
                                             <th>Дата</th>
                                             <th>Имя</th>
                                             <th>Тема</th>
+                                            <th>Файл</th>
                                             <th>Статус</th>
                                             <th></th>
                                         </tr>
@@ -41,6 +42,7 @@
                                                 <td>{{ s.created_at|date:"d.m.Y H:i" }}</td>
                                                 <td>{{ s.name }}</td>
                                                 <td class="admin-feedback-table__subject">{{ s.subject|truncatechars:60 }}</td>
+                                                <td>{% if s.attachment %}Да{% else %}—{% endif %}</td>
                                                 <td>
                                                     <span class="feedback-status feedback-status--{{ s.status }}">{{ s.get_status_display }}</span>
                                                 </td>

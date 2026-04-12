@@ -49,6 +49,14 @@
                                 <dd>{{ submission.subject }}</dd>
                                 <dt>Текст сообщения</dt>
                                 <dd class="admin-feedback-detail__message">{{ submission.message|linebreaksbr }}</dd>
+                                <dt>Вложение</dt>
+                                <dd>
+                                    {% if submission.attachment %}
+                                        <a href="{{ submission.attachment.url }}" target="_blank" rel="noopener noreferrer">{{ submission.attachment_basename }}</a>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </dd>
                                 <dt>Пользователь платформы</dt>
                                 <dd>
                                     {% if submission.user %}

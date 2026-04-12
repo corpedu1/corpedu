@@ -145,6 +145,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Вложения в форме обратной связи — до 5 МБ (проверка также в PublicFeedbackForm).
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
+
 AUTH_USER_MODEL = "app.User"
 
 LOGIN_URL = reverse_lazy("login")

@@ -6,6 +6,7 @@ import os
 
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 
@@ -484,6 +485,18 @@ class FeedbackSubmission(models.Model):
     email = models.EmailField(blank=True, verbose_name="Электронная почта")
     subject = models.CharField(max_length=255, verbose_name="Тема")
     message = models.TextField(verbose_name="Текст сообщения")
+    attachment = models.FileField(
+        upload_to="feedback/attachments/",
+        blank=True,
+        null=True,
+        verbose_name="Вложение",
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=("pdf", "doc", "docx", "png", "jpg", "jpeg", "txt", "zip"),
+                message="Допустимые форматы: PDF, DOC, DOCX, PNG, JPG, JPEG, TXT, ZIP.",
+            )
+        ],
+    )
     status = models.CharField(
         max_length=20,
         choices=FeedbackSubmissionStatus.choices,
@@ -509,3 +522,9 @@ class FeedbackSubmission(models.Model):
 
     def __str__(self):
         return f"{self.subject} ({self.get_status_display()})"
+
+    @property
+    def attachment_basename(self):
+        if not self.attachment:
+            return ""
+        return os.path.basename(self.attachment.name)

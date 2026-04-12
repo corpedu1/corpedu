@@ -240,15 +240,18 @@ class PublicFeedbackForm(forms.ModelForm):
     Публичная форма «Обратная связь» (сохранение в БД для администраторов).
     """
 
+    _max_attachment_bytes = 5 * 1024 * 1024
+
     class Meta:
         model = FeedbackSubmission
-        fields = ("name", "phone", "email", "subject", "message")
+        fields = ("name", "phone", "email", "subject", "message", "attachment")
         labels = {
             "name": "Имя",
             "phone": "Телефон",
             "email": "Почта",
             "subject": "Тема",
             "message": "Текст",
+            "attachment": "Файл",
         }
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": "Введите имя"}),
@@ -256,7 +259,19 @@ class PublicFeedbackForm(forms.ModelForm):
             "email": forms.EmailInput(attrs={"placeholder": "example@mail.ru"}),
             "subject": forms.TextInput(attrs={"placeholder": "Тема обращения"}),
             "message": forms.Textarea(attrs={"rows": 7, "placeholder": "Введите текст сообщения"}),
+            "attachment": forms.ClearableFileInput(
+                attrs={
+                    "class": "feedback-file-input",
+                    "accept": ".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt,.zip",
+                }
+            ),
         }
+
+    def clean_attachment(self):
+        f = self.cleaned_data.get("attachment")
+        if f and getattr(f, "size", 0) > self._max_attachment_bytes:
+            raise forms.ValidationError("Максимальный размер файла — 5 МБ.")
+        return f
 
     def clean(self):
         cleaned_data = super().clean()
