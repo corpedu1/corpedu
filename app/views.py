@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Count, Max, Q
+from django.db.models import Avg, Count, Max, Q
 from django.db.models.deletion import ProtectedError
 from django.http import FileResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -133,15 +133,109 @@ def _learning_material_statistics_rows():
     return rows
 
 
-def _material_statistics_xlsx_file(rows):
+def _top_materials_by_started(limit=5):
     """
-    Генерирует Excel (openpyxl) в памяти.
+    Топ учебных материалов по числу пользователей, начавших прохождение (started_count).
+    """
+    rows = _learning_material_statistics_rows()
+    if not rows:
+        return []
+    rows_sorted = sorted(rows, key=lambda r: r["started_count"], reverse=True)
+    return rows_sorted[:limit]
+
+
+def _knowledge_test_statistics_summary():
+    """
+    Сводка по платформенным тестам (KnowledgeTestAttempt с completed_at).
+    """
+    completed = KnowledgeTestAttempt.objects.filter(completed_at__isnull=False)
+    total = completed.count()
+    passed = completed.filter(is_passed=True).count()
+    failed = completed.filter(is_passed=False).count()
+    unknown = completed.filter(is_passed__isnull=True).count()
+    in_progress = KnowledgeTestAttempt.objects.filter(completed_at__isnull=True).count()
+    avg_score = completed.aggregate(avg=Avg("score_percent"))["avg"]
+    unique_users = completed.values("user_id").distinct().count()
+
+    pct_passed = round(100 * passed / total) if total else 0
+    pct_failed = round(100 * failed / total) if total else 0
+    pct_unknown = round(100 * unknown / total) if total else 0
+
+    return {
+        "total_completed": total,
+        "passed_count": passed,
+        "failed_count": failed,
+        "unknown_outcome_count": unknown,
+        "in_progress_count": in_progress,
+        "pct_passed": pct_passed,
+        "pct_failed": pct_failed,
+        "pct_unknown": pct_unknown,
+        "avg_score": round(avg_score, 1) if avg_score is not None else None,
+        "unique_users_completed": unique_users,
+    }
+
+
+def _knowledge_test_per_test_rows():
+    """
+    По каждому платформенному тесту: завершённые попытки, успешные / неуспешные.
+    """
+    rows = []
+    for test in KnowledgeTest.objects.order_by("title"):
+        att = KnowledgeTestAttempt.objects.filter(test=test, completed_at__isnull=False)
+        total_c = att.count()
+        passed_c = att.filter(is_passed=True).count()
+        failed_c = att.filter(is_passed=False).count()
+        pct = round(100 * passed_c / total_c) if total_c else None
+        rows.append(
+            {
+                "title": test.title,
+                "slug": test.slug,
+                "completed": total_c,
+                "passed": passed_c,
+                "failed": failed_c,
+                "pct_passed": pct,
+            }
+        )
+    return rows
+
+
+def _knowledge_test_score_distribution():
+    """
+    Распределение завершённых попыток по диапазонам процента балла (score_percent).
+    Не time-series: только статистика по итоговому баллу.
+    """
+    completed = KnowledgeTestAttempt.objects.filter(completed_at__isnull=False)
+    ordered = ["0–20%", "21–40%", "41–60%", "61–80%", "81–100%"]
+    counts = {k: 0 for k in ordered}
+    no_score = completed.filter(score_percent__isnull=True).count()
+    for s in completed.exclude(score_percent__isnull=True).values_list(
+        "score_percent", flat=True
+    ):
+        if s <= 20:
+            counts["0–20%"] += 1
+        elif s <= 40:
+            counts["21–40%"] += 1
+        elif s <= 60:
+            counts["41–60%"] += 1
+        elif s <= 80:
+            counts["61–80%"] += 1
+        else:
+            counts["81–100%"] += 1
+    rows = [{"label": k, "count": counts[k]} for k in ordered]
+    if no_score:
+        rows.append({"label": "Балл не задан", "count": no_score})
+    return rows
+
+
+def _material_statistics_xlsx_file(material_rows, test_summary=None, test_per_test_rows=None):
+    """
+    Генерирует Excel (openpyxl) в памяти: листы по материалам и (опционально) по тестам.
     """
     from openpyxl import Workbook
 
     wb = Workbook()
     ws = wb.active
-    ws.title = "Статистика"
+    ws.title = "Материалы"
     ws.append(
         [
             "Название материала",
@@ -149,11 +243,60 @@ def _material_statistics_xlsx_file(rows):
             "Кол-во завершивших на 100%",
         ]
     )
-    for row in rows:
+    for row in material_rows:
         ws.append([row["title"], row["started_count"], row["completed_count"]])
     ws.column_dimensions["A"].width = 48
     ws.column_dimensions["B"].width = 22
     ws.column_dimensions["C"].width = 34
+
+    if test_summary is not None:
+        ws2 = wb.create_sheet("Тесты — сводка")
+        ws2.append(["Показатель", "Значение"])
+        for label, key in (
+            ("Завершённых попыток всего", "total_completed"),
+            ("Успешно пройдено", "passed_count"),
+            ("Не пройдено", "failed_count"),
+            ("Исход не зафиксирован", "unknown_outcome_count"),
+            ("В процессе (не завершено)", "in_progress_count"),
+            ("Доля успешных, %", "pct_passed"),
+            ("Доля неуспешных, %", "pct_failed"),
+            ("Средний балл завершённых, %", "avg_score"),
+            ("Уникальных пользователей (завершили хотя бы раз)", "unique_users_completed"),
+        ):
+            val = test_summary.get(key)
+            if val is None:
+                val = "—"
+            ws2.append([label, val])
+        ws2.column_dimensions["A"].width = 52
+        ws2.column_dimensions["B"].width = 18
+
+    if test_per_test_rows:
+        ws3 = wb.create_sheet("Тесты — по тестам")
+        ws3.append(
+            [
+                "Тест",
+                "Завершено попыток",
+                "Успешно",
+                "Неуспешно",
+                "% успешных",
+            ]
+        )
+        for r in test_per_test_rows:
+            pct = r["pct_passed"]
+            ws3.append(
+                [
+                    r["title"],
+                    r["completed"],
+                    r["passed"],
+                    r["failed"],
+                    pct if pct is not None else "—",
+                ]
+            )
+        ws3.column_dimensions["A"].width = 48
+        ws3.column_dimensions["B"].width = 20
+        ws3.column_dimensions["C"].width = 14
+        ws3.column_dimensions["D"].width = 14
+        ws3.column_dimensions["E"].width = 14
 
     buffer = BytesIO()
     wb.save(buffer)
@@ -890,10 +1033,21 @@ def admin_material_statistics(request):
     if not _is_administrator(request.user):
         return redirect("landing")
     rows = _learning_material_statistics_rows()
+    test_stats = _knowledge_test_statistics_summary()
+    test_score_distribution = _knowledge_test_score_distribution()
+    top_materials_started = [
+        {"title": r["title"], "started_count": r["started_count"]}
+        for r in _top_materials_by_started(5)
+    ]
     return render(
         request,
         "admin_material_statistics.html",
-        {"rows": rows},
+        {
+            "rows": rows,
+            "test_stats": test_stats,
+            "test_score_distribution": test_score_distribution,
+            "top_materials_started": top_materials_started,
+        },
     )
 
 
@@ -905,7 +1059,9 @@ def admin_material_statistics_export(request):
     if not _is_administrator(request.user):
         return redirect("landing")
     rows = _learning_material_statistics_rows()
-    buffer = _material_statistics_xlsx_file(rows)
+    test_stats = _knowledge_test_statistics_summary()
+    test_per_test = _knowledge_test_per_test_rows()
+    buffer = _material_statistics_xlsx_file(rows, test_stats, test_per_test)
     return FileResponse(
         buffer,
         as_attachment=True,

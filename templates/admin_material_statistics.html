@@ -20,15 +20,106 @@
                         <p class="section-kicker">Администрирование</p>
                         <h1>Статистика учебных материалов</h1>
                         <p class="section-subtitle">
-                            Количество пользователей, начавших прохождение материала (есть запись прогресса),
-                            и завершивших его на 100% — по тем же правилам, что и индикатор прогресса в материале
-                            (мини-тесты на страницах или последняя страница, если тестов нет).
+                            Учебные материалы: сколько пользователей начали прохождение и сколько завершили на 100%
+                            (как индикатор прогресса в материале). Ниже — отдельная сводка по
+                            <strong>платформенным тестам</strong> (раздел тестов на сайте).
                         </p>
 
                         <p class="admin-material-stats-actions">
                             <a class="register-submit admin-save-button admin-material-stats-export" href="{% url 'admin_material_statistics_export' %}">
                                 Скачать Excel
                             </a>
+                        </p>
+
+                        <h2 class="admin-test-stats-heading">Платформенные тесты</h2>
+                        <p class="section-subtitle admin-test-stats-lead">
+                            Результаты по завершённым попыткам: доля успешных и неуспешных, средний балл, активные попытки без завершения.
+                        </p>
+
+                        <div class="admin-test-stats-kpi">
+                            <div class="admin-test-stats-kpi__card">
+                                <span class="admin-test-stats-kpi__label">Завершённых попыток</span>
+                                <span class="admin-test-stats-kpi__value">{{ test_stats.total_completed }}</span>
+                            </div>
+                            <div class="admin-test-stats-kpi__card">
+                                <span class="admin-test-stats-kpi__label">Успешно пройдено</span>
+                                <span class="admin-test-stats-kpi__value">{{ test_stats.passed_count }}</span>
+                                <span class="admin-test-stats-kpi__hint">{{ test_stats.pct_passed }}% от завершённых</span>
+                            </div>
+                            <div class="admin-test-stats-kpi__card">
+                                <span class="admin-test-stats-kpi__label">Не пройдено</span>
+                                <span class="admin-test-stats-kpi__value">{{ test_stats.failed_count }}</span>
+                                <span class="admin-test-stats-kpi__hint">{{ test_stats.pct_failed }}% от завершённых</span>
+                            </div>
+                            <div class="admin-test-stats-kpi__card">
+                                <span class="admin-test-stats-kpi__label">В процессе</span>
+                                <span class="admin-test-stats-kpi__value">{{ test_stats.in_progress_count }}</span>
+                                <span class="admin-test-stats-kpi__hint">начато, не завершено</span>
+                            </div>
+                            {% if test_stats.avg_score is not None %}
+                            <div class="admin-test-stats-kpi__card">
+                                <span class="admin-test-stats-kpi__label">Средний балл (завершённые)</span>
+                                <span class="admin-test-stats-kpi__value">{{ test_stats.avg_score }}%</span>
+                            </div>
+                            {% endif %}
+                            <div class="admin-test-stats-kpi__card">
+                                <span class="admin-test-stats-kpi__label">Пользователей с завершённой попыткой</span>
+                                <span class="admin-test-stats-kpi__value">{{ test_stats.unique_users_completed }}</span>
+                            </div>
+                        </div>
+
+                        {% if test_stats.unknown_outcome_count %}
+                        <p class="admin-test-stats-note">
+                            Завершённых попыток без явного исхода (успех/неуспех): {{ test_stats.unknown_outcome_count }}
+                            ({{ test_stats.pct_unknown }}% от завершённых).
+                        </p>
+                        {% endif %}
+
+                        <div class="admin-test-stats-charts">
+                            <div class="admin-test-stats-chart-box">
+                                <h3 class="admin-test-stats-chart-title">Распределение пройденных тестов</h3>
+                                {% if test_stats.total_completed %}
+                                <div class="admin-test-stats-chart-canvas-wrap">
+                                    <canvas id="chartTestOutcomes" width="320" height="280" aria-label="Распределение пройденных и непройденных попыток"></canvas>
+                                </div>
+                                {% else %}
+                                <p class="admin-test-stats-empty">Пока нет завершённых попыток платформенных тестов.</p>
+                                {% endif %}
+                            </div>
+                            <div class="admin-test-stats-chart-box admin-test-stats-chart-box--wide">
+                                <h3 class="admin-test-stats-chart-title">Распределение баллов завершённых попыток</h3>
+                                <p class="admin-test-stats-chart-sub">По итоговому проценту верных ответов (поле «Результат, %»).</p>
+                                {% if test_stats.total_completed %}
+                                <div class="admin-test-stats-chart-canvas-wrap admin-test-stats-chart-canvas-wrap--scores">
+                                    <canvas id="chartScoreDistribution" height="280" aria-label="Распределение баллов"></canvas>
+                                </div>
+                                {% else %}
+                                <p class="admin-test-stats-empty">Пока нет завершённых попыток платформенных тестов.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="admin-material-top-chart-section">
+                            {% if top_materials_started %}
+                            <div class="admin-test-stats-chart-box admin-material-top-chart-box">
+                                <h3 class="admin-test-stats-chart-title">Топ 5 популярные материалы</h3>
+                                <p class="admin-test-stats-chart-sub">
+                                    По числу пользователей, начавших материал (есть запись прогресса).
+                                </p>
+                                <div class="admin-material-top-chart-canvas-wrap">
+                                    <canvas id="chartTopMaterials" height="260" aria-label="Топ материалов по начавшим"></canvas>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p class="admin-test-stats-empty">Нет данных по материалам.</p>
+                            {% endif %}
+                        </div>
+
+                        <h2 class="admin-test-stats-heading admin-test-stats-heading--materials">Учебные материалы</h2>
+                        <p class="section-subtitle">
+                            Количество пользователей, начавших прохождение материала (есть запись прогресса),
+                            и завершивших его на 100% — по тем же правилам, что и индикатор прогресса в материале
+                            (мини-тесты на страницах или последняя страница, если тестов нет).
                         </p>
 
                         {% if rows %}
@@ -64,5 +155,160 @@
     </main>
 
     {% include "partials/footer.html" %}
+
+    {{ test_stats|json_script:"test-stats-data" }}
+    {{ test_score_distribution|json_script:"test-score-dist-data" }}
+    {{ top_materials_started|json_script:"top-materials-data" }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+    (function () {
+        var statsEl = document.getElementById("test-stats-data");
+        var scoreDistEl = document.getElementById("test-score-dist-data");
+        var topMatEl = document.getElementById("top-materials-data");
+        if (!statsEl || typeof Chart === "undefined") return;
+        var stats = JSON.parse(statsEl.textContent);
+        var scoreDist = scoreDistEl ? JSON.parse(scoreDistEl.textContent) : [];
+        var topMaterials = topMatEl ? JSON.parse(topMatEl.textContent) : [];
+
+        var doughnutEl = document.getElementById("chartTestOutcomes");
+        if (doughnutEl && stats.total_completed > 0) {
+            var labels = [];
+            var data = [];
+            var colors = [];
+            if (stats.passed_count > 0) {
+                labels.push("Успешно");
+                data.push(stats.passed_count);
+                colors.push("#0d9488");
+            }
+            if (stats.failed_count > 0) {
+                labels.push("Не пройдено");
+                data.push(stats.failed_count);
+                colors.push("#be123c");
+            }
+            if (stats.unknown_outcome_count > 0) {
+                labels.push("Исход не задан");
+                data.push(stats.unknown_outcome_count);
+                colors.push("#64748b");
+            }
+            if (labels.length === 0) {
+                labels = ["Завершено"];
+                data = [stats.total_completed];
+                colors = ["#0ea5a5"];
+            }
+            new Chart(doughnutEl.getContext("2d"), {
+                type: "doughnut",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: "bottom", labels: { color: "#0f172a", font: { size: 13 } } }
+                    }
+                }
+            });
+        }
+
+        var barEl = document.getElementById("chartScoreDistribution");
+        if (barEl && scoreDist.length && stats.total_completed > 0) {
+            var labels = scoreDist.map(function (p) { return p.label; });
+            var counts = scoreDist.map(function (p) { return p.count; });
+            var colors = labels.map(function (lbl) {
+                if (lbl === "Балл не задан") return "#94a3b8";
+                if (lbl === "0–20%" || lbl === "21–40%") return "#f43f5e";
+                if (lbl === "41–60%") return "#f59e0b";
+                return "#0d9488";
+            });
+            new Chart(barEl.getContext("2d"), {
+                type: "bar",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Попыток",
+                        data: counts,
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: { color: "#475569", font: { size: 11 } },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: "#475569", precision: 0, stepSize: 1 },
+                            grid: { color: "rgba(15, 23, 42, 0.08)" }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        var topEl = document.getElementById("chartTopMaterials");
+        if (topEl && topMaterials.length) {
+            /* Сервер отдаёт топ по убыванию (самый популярный первый). В Chart.js для
+               horizontal bar с indexAxis:'y' первая категория — снизу, последняя — сверху.
+               Поэтому переворачиваем: снизу меньше начавших, сверху — больше. */
+            var ordered = topMaterials.slice().reverse();
+            var mLabels = ordered.map(function (r) {
+                var s = r.title || "";
+                return s.length > 48 ? s.slice(0, 46) + "…" : s;
+            });
+            var mCounts = ordered.map(function (r) { return r.started_count; });
+            new Chart(topEl.getContext("2d"), {
+                type: "bar",
+                data: {
+                    labels: mLabels,
+                    datasets: [{
+                        label: "Начавших",
+                        data: mCounts,
+                        backgroundColor: "#0ea5a5",
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: "y",
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { color: "#475569", precision: 0 },
+                            grid: { color: "rgba(15, 23, 42, 0.08)" }
+                        },
+                        y: {
+                            ticks: { color: "#0f172a", font: { size: 11 } },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function (items) {
+                                    var i = items[0].dataIndex;
+                                    return ordered[i] ? ordered[i].title : "";
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    })();
+    </script>
 </body>
 </html>
