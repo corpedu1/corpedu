@@ -805,7 +805,21 @@ a {
     color: #7dd3fc;
 }
 
+.footer__bottom-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    text-align: right;
+}
+
 .footer__copy {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.footer__byline {
     margin: 0;
     font-size: 0.82rem;
     color: #64748b;
@@ -3755,6 +3769,11 @@ a.admin-material-stats-export {
     .footer__bottom {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .footer__bottom-meta {
+        align-items: flex-start;
+        text-align: left;
     }
 
     .panel__list {
