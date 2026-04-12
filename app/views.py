@@ -332,6 +332,20 @@ def faq(request):
     return render(request, "faq.html")
 
 
+def privacy(request):
+    """
+    Статическая страница «Политика конфиденциальности» (доступна без авторизации).
+    """
+    return render(request, "privacy.html")
+
+
+def terms(request):
+    """
+    Статическая страница «Пользовательское соглашение» (доступна без авторизации).
+    """
+    return render(request, "terms.html")
+
+
 @login_required
 def materials(request):
     """

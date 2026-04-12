@@ -2,16 +2,81 @@
 <header class="topbar">
     <div class="container topbar__content">
         <a class="brand" href="/">CyberLearn Витте</a>
-        <nav class="topbar__nav">
-            <a href="/about/">О нас</a>
-            <a href="{% url 'advantages' %}">Преимущества</a>
-            <a href="{% url 'organizations' %}">Для организаций</a>
-            <a href="{% url 'security' %}">Безопасность</a>
-            <a href="/materials/">Материалы</a>
-            <a href="{% url 'knowledge_tests' %}">Тесты</a>
-            <a href="/contacts/">Контакты</a>
-            <a href="/feedback/">Обратная связь</a>
-            <a href="/faq/">FAQ</a>
+        <nav class="topbar__nav" aria-label="Основная навигация">
+            <div class="topbar__nav-group" data-nav-dropdown>
+                <button
+                    type="button"
+                    class="topbar__nav-trigger"
+                    id="topbar-nav-about"
+                    data-nav-dropdown-toggle
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    aria-controls="topbar-nav-about-menu"
+                >
+                    О платформе
+                </button>
+                <div
+                    class="topbar__nav-dropdown"
+                    id="topbar-nav-about-menu"
+                    data-nav-dropdown-menu
+                    role="group"
+                    aria-labelledby="topbar-nav-about"
+                >
+                    <a href="/about/" class="topbar__nav-dropdown-link">О нас</a>
+                    <a href="{% url 'advantages' %}" class="topbar__nav-dropdown-link">Преимущества</a>
+                    <a href="{% url 'organizations' %}" class="topbar__nav-dropdown-link">Для организаций</a>
+                    <a href="{% url 'security' %}" class="topbar__nav-dropdown-link">Безопасность</a>
+                </div>
+            </div>
+            <div class="topbar__nav-group" data-nav-dropdown>
+                <button
+                    type="button"
+                    class="topbar__nav-trigger"
+                    id="topbar-nav-service"
+                    data-nav-dropdown-toggle
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    aria-controls="topbar-nav-service-menu"
+                >
+                    Сервис
+                </button>
+                <div
+                    class="topbar__nav-dropdown"
+                    id="topbar-nav-service-menu"
+                    data-nav-dropdown-menu
+                    role="group"
+                    aria-labelledby="topbar-nav-service"
+                >
+                    <a href="/materials/" class="topbar__nav-dropdown-link">Материалы</a>
+                    <a href="{% url 'knowledge_tests' %}" class="topbar__nav-dropdown-link">Тесты</a>
+                    <a href="/faq/" class="topbar__nav-dropdown-link">FAQ</a>
+                    <a href="{% url 'privacy' %}" class="topbar__nav-dropdown-link">Политика конфиденциальности</a>
+                    <a href="{% url 'terms' %}" class="topbar__nav-dropdown-link">Пользовательское соглашение</a>
+                </div>
+            </div>
+            <div class="topbar__nav-group" data-nav-dropdown>
+                <button
+                    type="button"
+                    class="topbar__nav-trigger"
+                    id="topbar-nav-contacts"
+                    data-nav-dropdown-toggle
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    aria-controls="topbar-nav-contacts-menu"
+                >
+                    Контакты
+                </button>
+                <div
+                    class="topbar__nav-dropdown"
+                    id="topbar-nav-contacts-menu"
+                    data-nav-dropdown-menu
+                    role="group"
+                    aria-labelledby="topbar-nav-contacts"
+                >
+                    <a href="/contacts/" class="topbar__nav-dropdown-link">Все контакты</a>
+                    <a href="/feedback/" class="topbar__nav-dropdown-link">Обратная связь</a>
+                </div>
+            </div>
         </nav>
         <div class="topbar__actions">
             {% if request.user.is_authenticated %}

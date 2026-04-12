@@ -69,6 +69,10 @@ def breadcrumbs(context):
         add_current("Обратная связь")
     elif name == "faq":
         add_current("FAQ")
+    elif name == "privacy":
+        add_current("Политика конфиденциальности")
+    elif name == "terms":
+        add_current("Пользовательское соглашение")
 
     # — Материалы —
     elif name == "materials":

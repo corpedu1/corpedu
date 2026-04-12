@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Политика конфиденциальности | CyberLearn Витте</title>
+    {% load static %}
+    {% include "partials/favicon.html" %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="legal-page">
+    {% include "partials/navbar.html" %}
+
+    <main>
+        <section class="section legal-intro">
+            <div class="container">
+                <p class="section-kicker">Документы сервиса</p>
+                <h1>Политика конфиденциальности</h1>
+                <p class="section-subtitle">
+                    Настоящий документ описывает базовые принципы обработки персональных данных и иной информации
+                    в рамках использования платформы CyberLearn Витте. Документ носит информационный характер
+                    и может обновляться по мере развития сервиса.
+                </p>
+            </div>
+        </section>
+
+        <section class="section section--accent">
+            <div class="container">
+                <p class="section-kicker">Общие положения</p>
+                <h2>Цели обработки данных</h2>
+                <div class="legal-prose">
+                    <p>
+                        Платформа предназначена для организации корпоративного обучения по информационной безопасности,
+                        учёта прогресса и проверки знаний. Данные пользователей обрабатываются в объёме, необходимом
+                        для предоставления этих функций: регистрация и вход, работа в личном кабинете, прохождение
+                        материалов и тестов, обратная связь с администрацией.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <p class="section-kicker">Состав данных</p>
+                <h2>Какие сведения могут обрабатываться</h2>
+                <ul class="legal-prose legal-prose--list">
+                    <li>учётные данные (например, имя пользователя и адрес электронной почты, указанные при регистрации);</li>
+                    <li>служебная информация о работе в сервисе (прогресс по материалам, результаты тестов, время активности);</li>
+                    <li>содержание сообщений, направленных через формы обратной связи;</li>
+                    <li>технические данные, необходимые для стабильной работы сайта (например, сведения о сессии в рамках стандартных механизмов веб-приложений).</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section section--accent">
+            <div class="container">
+                <p class="section-kicker">Меры защиты</p>
+                <h2>Безопасность и ограничение доступа</h2>
+                <div class="legal-prose">
+                    <p>
+                        Доступ к персональным и учебным данным внутри сервиса разграничивается по ролям пользователей.
+                        Администраторы и кураторы получают доступ только к тем сведениям, которые необходимы для
+                        управления обучением и поддержки пользователей. Рекомендуется использовать устойчивые пароли
+                        и не передавать учётные данные третьим лицам.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section legal-cta">
+            <div class="container">
+                <p class="section-kicker">Вопросы</p>
+                <h2>Связь по вопросам данных</h2>
+                <p class="section-subtitle">
+                    Уточнения можно направить через раздел
+                    <a href="{% url 'feedback' %}">обратной связи</a> или по контактам на странице
+                    <a href="{% url 'contacts' %}">«Контакты»</a>. Также доступны
+                    <a href="{% url 'terms' %}">пользовательское соглашение</a> и раздел
+                    <a href="{% url 'security' %}">«Безопасность»</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    {% include "partials/footer.html" %}
+</body>
+</html>
